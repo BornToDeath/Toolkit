@@ -41,7 +41,7 @@ public: /* Methods                                         */
     /**
      * 释放单例
      */
-    static void releaseSingleton();
+    void releaseSingleton();
 
     /**
      * 设置日志根目录
@@ -134,6 +134,11 @@ private: /* Fields                                         */
      * 容器，存放不同类型的日志存储器
      */
     std::map<LogType, std::shared_ptr<LogModel>> logContainer;
+
+    /**
+     * 日志线程是否退出的标志
+     */
+    static bool isQuit;
 };
 
 

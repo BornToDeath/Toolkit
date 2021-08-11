@@ -65,6 +65,11 @@ bool Log::init(const char *const rootDir) {
     return true;
 }
 
+void Log::release() {
+    isInit.store(false);
+    LogImpl::getInstance()->releaseSingleton();
+}
+
 void Log::debug(const char *tag, const char *format, ...) {
 
     // 对可变参数进行组合，合成一条完整的日志数据
@@ -135,7 +140,6 @@ bool Log::save(LogType type, LogLevel level, const char *tag, const char *log) {
         }
         return false;
     }
-    return false;
 
     // 存储日志
     logger->handleLog(type, level, tag, threadName, log);

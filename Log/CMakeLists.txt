@@ -23,9 +23,8 @@ if (NOT INCLUDE_LOG)
     )
 
     # 测试
-    set(LOG_TEST YES)
     if (LOG_TEST)
-#        add_definitions(-DBUILD_TYPE_DEBUG)
+        add_definitions(-DBUILD_TYPE_DEBUG)
         add_executable(runLog test/test.cpp)
         target_link_libraries(
                 runLog

@@ -8,11 +8,11 @@ cd $(dirname $0) || exit
 
 # ========== 一些开关 ==========
 
-# 是否运行可执行文件
-RUN_EXE="yes"
+# 是否是测试环境
+LOG_TEST="no"
 
 # 单元测试开关
-UNIT_TEST="yes"
+UNIT_TEST="no"
 
 # ============================
 
@@ -43,8 +43,12 @@ else
   echo "MD5不相等，正在重新编译..."
   rm -rf ./build && mkdir ./build && cd ./build || exit
 
-  if [ ${UNIT_TEST} == "yes" ]; then
-    cmake ../.. -DUNIT_TEST=YES || (echo "cmake失败！" && exit)
+  if [ ${LOG_TEST} == "yes" ]; then
+    if [ ${UNIT_TEST} == "yes" ]; then
+      cmake ../.. -DLOG_TEST=YES -DUNIT_TEST=YES || (echo "cmake失败！" && exit)
+    else
+      cmake ../.. -DLOG_TEST=YES || (echo "cmake失败！" && exit)
+    fi
   else
     cmake ../.. || (echo "cmake失败！" && exit)
   fi
@@ -62,7 +66,7 @@ make -j8 || exit
 
 echo "============================================================="
 
-if [ ${RUN_EXE} == "yes" ]; then
+if [ ${LOG_TEST} == "yes" ]; then
   function onSigInt() {
     echo " ( Ctrl+C ) "
   }

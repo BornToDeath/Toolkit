@@ -49,6 +49,13 @@ public:
     static bool init(const char *rootDir);
 
     /**
+     * 释放资源，退出时调用。
+     * 注意：调用此方法后就不能再调用 Log 的相关方法存储日志！
+     * @return
+     */
+    static void release();
+
+    /**
      * debug 日志信息
      * @param tag    标签
      * @param format 格式化字符串

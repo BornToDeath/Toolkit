@@ -26,6 +26,7 @@
 std::string LogImpl::logRootDir;
 LogImpl *LogImpl::logger = nullptr;
 std::mutex LogImpl::logMutex;
+bool LogImpl::isQuit = false;
 
 // 日志处理的条件变量，作为一种同步机制
 std::condition_variable LogImpl::logConsumeCondition;
@@ -67,14 +68,31 @@ LogImpl *&LogImpl::getInstance() {
 }
 
 void LogImpl::releaseSingleton() {
-    if (LogImpl::logger) {
-        delete LogImpl::logger;
-        LogImpl::logger = nullptr;
+    isQuit = true;
+    logConsumeCondition.notify_all();
+
+    // 将队列中剩余日志处理完
+    while (!this->logQueue.empty()) {
+        std::shared_ptr<LogData> log = nullptr;
+        {
+            std::unique_lock<std::mutex> lock(logMutex);
+            log = this->logQueue.front();
+            this->logQueue.pop();
+        }
+        this->writeLog(log);
     }
+
+    delete this;
+    LogImpl::logger = nullptr;
 }
 
 void LogImpl::handleLog(LogType type, LogLevel level, const char *const tag,
                         const char *const threadName, const char *const logText) {
+
+    // 退出日志线程时不再处理日志
+    if (isQuit) {
+        return;
+    }
 
     // 当前时间
     std::string now = LogTools::getCurrentDateTime("%Y-%m-%d %H:%M:%S");
@@ -130,14 +148,22 @@ bool LogImpl::fetchLogAndWrite() {
         // 消费者
         {
             std::unique_lock<std::mutex> lock(logMutex);
-//            std::this_thread::sleep_for(std::chrono::seconds(1));
 
-            // 线程阻塞，直到日志队列不为空  TODO:wait函数有可能会导致整个进程无法退出
-            logConsumeCondition.wait(lock, [this]() { return !this->logQueue.empty(); });
+            // 线程阻塞，直到日志队列不为空
+            logConsumeCondition.wait(lock, [this]() {
+                if (isQuit) {
+                    return true;
+                }
+                return !this->logQueue.empty();
+            });
+
+            // 是否退出循环
+            if (isQuit) {
+                break;
+            }
 
             // 取日志队列中的头数据
             logData = this->logQueue.front();
-
             this->logQueue.pop();
         }
 
@@ -145,6 +171,11 @@ bool LogImpl::fetchLogAndWrite() {
         this->writeLog(logData);
     }
 
+    if (DEBUG) {
+        LogTools::printLog(LogLevel::Info, TAG, LOG_THREAD_NAME, ">>> 日志线程退出！");
+    }
+
+    return true;
 }
 
 bool LogImpl::writeLog(const std::shared_ptr<LogData> &logData) {

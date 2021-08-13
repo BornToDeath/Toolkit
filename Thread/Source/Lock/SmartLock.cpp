@@ -8,19 +8,25 @@
 #define TAG "SmartLock"
 
 
-SmartLock::SmartLock() {
-    mutex.lock();
+SmartLock::SmartLock(std::mutex &mutex) : mMutex(&mutex) {
+    if (mMutex) {
+        mMutex->lock();
+    }
 }
 
-SmartLock::SmartLock(const std::string name) {
-    this->name = name;
-    logger.i(TAG, name + " locked");
-    mutex.lock();
+SmartLock::SmartLock(std::mutex &mutex, const std::string name) : mMutex(&mutex) {
+    if (mMutex) {
+        this->name = name;
+        logger.i(TAG, name + " locked.");
+        mMutex->lock();
+    }
 }
 
 SmartLock::~SmartLock() {
-    mutex.unlock();
-    if (!this->name.empty()) {
-        logger.i(TAG, name + " unlocked");
+    if (mMutex) {
+        mMutex->unlock();
+        if (!this->name.empty()) {
+            logger.i(TAG, name + " unlocked.");
+        }
     }
 }

@@ -19,13 +19,15 @@ public:
 
     SmartLock();
 
-    explicit SmartLock(const std::string name);
+    SmartLock(std::mutex &mutex);
+
+    explicit SmartLock(std::mutex &mutex, const std::string name);
 
     ~SmartLock();
 
 private:
 
-    std::mutex mutex;
+    std::mutex *mMutex;
 
     std::string name;
 

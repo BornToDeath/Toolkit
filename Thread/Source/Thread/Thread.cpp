@@ -8,7 +8,7 @@
 #include "Thread/Thread.h"
 #include "Thread/ThreadLocal.h"
 #include "Thread/ThreadLog.h"
-#include "ThreadUtil.h"
+#include "Thread/ThreadUtil.h"
 
 #define TAG "Thread"
 

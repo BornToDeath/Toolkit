@@ -7,14 +7,14 @@
 #include "Thread/ThreadLog.h"
 #include "Thread/SmartThread.h"
 #include "Thread/LoopThread.h"
+#include "Thread/SmartLoopThread.h"
 
 #define TAG "Test"
 
 void threadTest();
-
 void smartThreadTest();
-
 void loopThreadTest();
+void smartLoopThreadTest();
 
 
 int main() {
@@ -23,11 +23,45 @@ int main() {
     // 测试
 //    threadTest();
 //    smartThreadTest();
-    loopThreadTest();
+//    loopThreadTest();
+    smartLoopThreadTest();
 
     logger.i(TAG, "主线程休眠中...");
     pthread_exit(nullptr);
     return 0;
+}
+
+void smartLoopThreadTest() {
+    auto t1 = SmartLoopThread::newThread();
+    t1->setName("T1");
+    t1->post([](){
+        logger.i(TAG, "正在执行 1");
+        Thread::sleep(1 * 1000);
+        logger.i(TAG, "1 执行结束");
+    });
+    t1->post([](){
+        logger.i(TAG, "正在执行 2");
+        Thread::sleep(1 * 1000);
+        logger.i(TAG, "2 执行结束");
+    });
+    t1->setOnFinishCallback([](){
+        logger.i(TAG, "要结束啦");
+        Thread::sleep(1*1000);
+    });
+
+    t1->start();
+    logger.i(TAG, t1->getName() + " 线程已经启动！");
+    Thread::sleep(3*1000);
+
+    t1->post([](){
+        logger.i(TAG, "正在执行 3");
+        Thread::sleep(1 * 1000);
+        logger.i(TAG, "3 执行结束");
+    });
+    Thread::sleep(3*1000);
+
+    t1->tryStop();
+    logger.i(TAG, t1->getName() + " 线程将要停止");
 }
 
 void loopThreadTest() {

@@ -38,46 +38,56 @@ int main() {
     messageQueueTest();
 
     logger.i(TAG, "主线程休眠中...");
-    pthread_exit(nullptr);
+    while (true) {
+        logger.i(TAG, "主线程休眠中...");
+        Thread::sleep(3 * 1000);
+    }
+//    pthread_exit(nullptr);
     return 0;
 }
 
 void messageQueueTest() {
 
     static bool isQuit = false;
-    auto msg = Message::obtain();
-    msg->what = 10;
-
     MessageQueue queue;
-    queue.enqueueMessage(msg, 0);
+
+    auto msg1 = Message::obtain();
+    msg1->what = 10;
+    queue.enqueueMessage(msg1, 0);
+
+    auto msg2 = Message::obtain();
+    msg2->what = 20;
+    queue.enqueueMessage(msg2, 0);
 
     auto runnable = [&queue]() {
         while (!isQuit) {
             // 取消息
             logger.i(TAG, "准备取消息...");
             auto newMsg = queue.next();
-            logger.i(TAG, "what: " + std::to_string(newMsg->what));
+            if (newMsg) {
+                logger.i(TAG, "what: " + std::to_string(newMsg->what));
+            } else {
+                logger.i(TAG, "没有获取到消息！");
+            }
         }
     };
 
-//    Thread t1(runnable);
-//    t1.setName("T1");
-//    t1.start();
+    Thread t1(runnable);
+    t1.setName("T1");
+    t1.start();
 
-    for (int i = 0; i < 1; ++i) {
+    for (int i = 1; i <= 1; ++i) {
         // 发消息
-        queue.enqueueMessage(msg, 0);
+        auto msgg = Message::obtain();
+        msgg->what = i + 1;
+        queue.enqueueMessage(msgg, 0);
         Thread::sleep(1 * 1000);
     }
 
+    // 退出消息队列
     logger.i(TAG, "MessageQueue 准备退出");
     isQuit = true;
     queue.quit(true);
-
-    while (true) {
-        logger.i(TAG, "主线程休眠中...");
-        Thread::sleep(3 * 1000);
-    }
 }
 
 void messageTest() {

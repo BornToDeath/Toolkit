@@ -15,11 +15,11 @@ std::recursive_mutex Message::mutex;
 
 
 Message *Message::obtain() {
-    logger.i(TAG, "等待 obtain()");
+//    logger.i(TAG, "等待 obtain()");
     SmartRecursiveLock lock(mutex, "Message-Mutex");
 
     if (sPool == nullptr) {
-        logger.i(TAG, "返回一个新的 Message 对象");
+//        logger.i(TAG, "返回一个新的 Message 对象");
         auto message = new Message();
         return message;
     }

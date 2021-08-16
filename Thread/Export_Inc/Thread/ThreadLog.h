@@ -19,7 +19,7 @@ public:
 
 public:
 
-    void i(const std::string &tag, const std::string &msg);
+    void i(const std::string &tag, const std::string &msg, ...);
 
     void v(const std::string &tag, const std::string &msg);
 

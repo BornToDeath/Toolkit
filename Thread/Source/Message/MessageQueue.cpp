@@ -23,8 +23,10 @@ void MessageQueue::enqueueMessage(Message *message, Timestamp when) {
         return;
     }
 
+    message->when = when;
+
     {
-        logger.i(TAG, "enqueue a message.");
+//        logger.i(TAG, "enqueue a message.");
 
         // 保证头结点的线程安全
         SmartRecursiveLock lock(headerMutex);
@@ -36,13 +38,13 @@ void MessageQueue::enqueueMessage(Message *message, Timestamp when) {
         } else {
             // 找到要插入的位置
             Message *prev;
-            while (true) {
+            do {
                 prev = p;
                 p = p->next;
                 if (p == nullptr || when < p->when) {
                     break;
                 }
-            }
+            } while (true);
             // 插入到 prev 和 p 之间
             message->next = p;
             prev->next = message;
@@ -54,7 +56,7 @@ void MessageQueue::enqueueMessage(Message *message, Timestamp when) {
 }
 
 void MessageQueue::awake() {
-    logger.i(TAG, "awake");
+//    logger.i(TAG, "awake");
     std::unique_lock<std::mutex> lock(pollOnceMutex);
     hasMessage = true;
     condition.notify_all();
@@ -108,7 +110,7 @@ Message *MessageQueue::next() {
             Message *msg = header;
             if (msg != nullptr) {
                 auto now = ThreadUtil::timeMills();
-                if(now < msg->when) {
+                if (now < msg->when) {
                     // 等待
                     waitMills = msg->when - now;
                 } else {
@@ -145,12 +147,12 @@ void MessageQueue::pollOnce(long long waitMills) {
                 return;
             }
             condition.wait(lock);
-            logger.i(TAG, "pollOnce 结束无限等待");
+//            logger.i(TAG, "pollOnce 结束无限等待");
             return;
         }
 
         condition.wait_for(lock, std::chrono::milliseconds(waitMills));
-        logger.i(TAG, "pollOnce 结束等待");
+//        logger.i(TAG, "pollOnce 结束等待");
     }
 }
 
@@ -179,7 +181,7 @@ void MessageQueue::removeAllMessagesSafely() {
     // 保证头结点的线程安全
     SmartRecursiveLock lock(headerMutex);
 
-    Message* p = header;
+    Message *p = header;
     if (p == nullptr) {
         return;
     }
@@ -193,7 +195,7 @@ void MessageQueue::removeAllMessagesSafely() {
     }
 
     // 找第一个执行时间晚于当前时刻的消息
-    Message* firstNeedRemoveMsg;
+    Message *firstNeedRemoveMsg;
     while (true) {
         firstNeedRemoveMsg = p->next;
         if (firstNeedRemoveMsg == nullptr) {
@@ -214,13 +216,14 @@ void MessageQueue::removeAllMessagesSafely() {
         firstNeedRemoveMsg = p->next;
         p->recycle();
     } while (firstNeedRemoveMsg != nullptr);
+    logger.i(TAG, __PRETTY_FUNCTION__ + std::string("|") + std::to_string(__LINE__));
 }
 
 void MessageQueue::removeAllMessagesNotSafely() {
     // 保证头结点的线程安全
     SmartRecursiveLock headerSafe(headerMutex);
 
-    Message* p = header;
+    Message *p = header;
     while (p != nullptr) {
         logger.i(TAG, "回收消息[2]");
         auto n = p->next;

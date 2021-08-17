@@ -36,13 +36,13 @@ private:
 
 public:
 
-    Message *next;
-
     Handler *target;
 
     Runnable callback;
 
     Timestamp when;
+
+    Message *next;
 
     int what;
 

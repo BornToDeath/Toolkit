@@ -69,5 +69,5 @@ void Message::recycle() {
     this->isInUse = false;
     sPool = this;
     ++sPoolSize;
-    logger.i(TAG, "Message 已经被 recycled.");
+    logger.i(TAG, "Message 已经被 recycle.");
 }

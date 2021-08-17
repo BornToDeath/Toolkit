@@ -28,6 +28,8 @@ void messageQueueTest();
 
 void looperTest();
 
+void handlerTest();
+
 
 int main() {
     prctl(PR_SET_NAME, "MainThread");
@@ -39,11 +41,42 @@ int main() {
 //    smartLoopThreadTest();
 //    messageTest();
 //    messageQueueTest();
-    looperTest();
+//    looperTest();
+    handlerTest();
 
     logger.i(TAG, "主线程休眠中...");
 //    pthread_exit(nullptr);
     return 0;
+}
+
+void handlerTest() {
+    Looper *looper = nullptr;
+    Thread t1([&looper]() {
+        auto flag = Looper::prepare();
+        logger.i(TAG, "flag: %d", flag);
+        looper = Looper::myLooper();
+        Looper::loop();
+    });
+    t1.setName("LooperThread");
+    t1.start();
+    Thread::sleep(1 * 1000);
+
+    auto handler = new Handler(looper);
+    handler->post([]() {
+        logger.i(TAG, "【1】我是一条消息，我被执行了");
+    });
+    handler->postDelay([]() {
+        logger.i(TAG, "【2】我是一条消息，我被延迟执行了");
+    }, 2000);
+
+    Thread::sleep(3 * 1000);
+    looper->quitSafely();
+    logger.i(TAG, "退出 looper");
+
+    while (true) {
+        logger.i(TAG, "主线程休眠中...");
+        Thread::sleep(3 * 1000);
+    }
 }
 
 void looperTest() {
@@ -63,7 +96,7 @@ void looperTest() {
         logger.i(TAG, "Looper is null.");
     }
 
-    auto handler = new Handler();
+    auto handler = new Handler(looper);
 
     auto msg1 = Message::obtain();
     msg1->what = 10;

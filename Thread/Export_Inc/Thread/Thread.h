@@ -26,6 +26,7 @@ public:
 
     /**
      * 启动线程
+     * 注意：线程在析构时会自动退出
      */
     virtual void start();
 

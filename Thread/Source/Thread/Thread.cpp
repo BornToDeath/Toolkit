@@ -34,6 +34,14 @@ Thread::Thread(const Runnable &runnable) {
     __companion.setName("Thread");
 }
 
+Thread::~Thread() {
+    logger.i(TAG, "Thread::~Thread() called!");
+    if (mSTDThread) {
+        delete mSTDThread;
+        mSTDThread = nullptr;
+    }
+}
+
 Thread *Thread::currentThread() {
     if (sCurrentThread == nullptr) {
 //        sCurrentThread = new ThreadLocal<Thread>();
@@ -84,14 +92,6 @@ void Thread::start() {
 
     mSTDThread = new std::thread(_functional);
     mSTDThread->detach();
-}
-
-Thread::~Thread() {
-    logger.i(TAG, "Thread::~Thread() called!");
-    if (mSTDThread) {
-        delete mSTDThread;
-        mSTDThread = nullptr;
-    }
 }
 
 void Thread::setRunnable(const Runnable &runnable) {

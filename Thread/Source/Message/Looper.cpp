@@ -59,6 +59,7 @@ void Looper::loop() {
         // 取一条消息
         auto message = looper->queue->next();
         if (message == nullptr) {
+            logger.i(TAG, "退出 Looper 循环");
             return;
         }
         if (message->target) {

@@ -15,7 +15,7 @@ MessageQueue::MessageQueue() : isQuited(false), hasMessage(false), header(nullpt
 }
 
 MessageQueue::~MessageQueue() {
-    logger.i(TAG, "~MessageQueue() called.");
+//    logger.i(TAG, "~MessageQueue() called.");
 }
 
 void MessageQueue::enqueueMessage(Message *message, Timestamp when) {
@@ -211,12 +211,11 @@ void MessageQueue::removeAllMessagesSafely() {
 
     // 回收后面的所有消息
     do {
-        logger.i("MessageQueue", "回收消息[1]");
+//        logger.i("MessageQueue", "回收消息[1]");
         p = firstNeedRemoveMsg;
         firstNeedRemoveMsg = p->next;
         p->recycle();
     } while (firstNeedRemoveMsg != nullptr);
-    logger.i(TAG, __PRETTY_FUNCTION__ + std::string("|") + std::to_string(__LINE__));
 }
 
 void MessageQueue::removeAllMessagesNotSafely() {
@@ -225,10 +224,14 @@ void MessageQueue::removeAllMessagesNotSafely() {
 
     Message *p = header;
     while (p != nullptr) {
-        logger.i(TAG, "回收消息[2]");
+//        logger.i(TAG, "回收消息[2]");
         auto n = p->next;
         p->recycle();
         p = n;
     }
     header = nullptr;
+}
+
+void MessageQueue::setName(const std::string &name) {
+    this->name = name;
 }

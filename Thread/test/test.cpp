@@ -10,6 +10,7 @@
 #include "Thread/SmartLoopThread.h"
 #include "Message/Message.h"
 #include "Message/MessageQueue.h"
+#include "Looper/Looper.h"
 
 #define TAG "Test"
 
@@ -25,6 +26,8 @@ void messageTest();
 
 void messageQueueTest();
 
+void looperTest();
+
 
 int main() {
     prctl(PR_SET_NAME, "MainThread");
@@ -35,15 +38,51 @@ int main() {
 //    loopThreadTest();
 //    smartLoopThreadTest();
 //    messageTest();
-    messageQueueTest();
+//    messageQueueTest();
+    looperTest();
 
     logger.i(TAG, "主线程休眠中...");
+//    pthread_exit(nullptr);
+    return 0;
+}
+
+void looperTest() {
+    Looper *looper = nullptr;
+    Thread t1([&looper]() {
+        auto flag = Looper::prepare();
+        logger.i(TAG, "flag: %d", flag);
+        looper = Looper::myLooper();
+        Looper::loop();
+    });
+    t1.setName("LooperThread");
+    t1.start();
+    Thread::sleep(1 * 1000);
+
+//    auto looper = Looper::myLooper();
+    if (looper == nullptr) {
+        logger.i(TAG, "Looper is null.");
+    }
+
+    auto handler = new Handler();
+
+    auto msg1 = Message::obtain();
+    msg1->what = 10;
+    msg1->target = handler;
+    looper->queue->enqueueMessage(msg1, 0);
+
+    auto msg2 = Message::obtain();
+    msg2->what = 20;
+    msg2->target = handler;
+    looper->queue->enqueueMessage(msg2, 0);
+
+    Thread::sleep(3 * 1000);
+    looper->quitSafely();
+    delete handler;
+
     while (true) {
         logger.i(TAG, "主线程休眠中...");
         Thread::sleep(3 * 1000);
     }
-//    pthread_exit(nullptr);
-    return 0;
 }
 
 void messageQueueTest() {

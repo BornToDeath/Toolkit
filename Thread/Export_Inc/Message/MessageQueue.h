@@ -41,6 +41,12 @@ public:
      */
     void quit(bool isSafely);
 
+    /**
+     * 设置当前 queue 所属线程的名称
+     * @param name
+     */
+    void setName(const std::string &name);
+
 private:
 
     /**
@@ -96,6 +102,7 @@ private:
      */
     std::mutex quitMutex;
 
+    std::string name;
 };
 
 

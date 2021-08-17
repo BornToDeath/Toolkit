@@ -45,7 +45,7 @@ Thread *Thread::currentThread() {
 
 void Thread::start() {
     if (mStarted) {
-        logger.i(TAG, "Started!");
+//        logger.i(TAG, "Started!");
         return;
     }
 
@@ -59,7 +59,7 @@ void Thread::start() {
             prctl(PR_SET_NAME, mName.c_str());
         }
 
-        logger.i(TAG, "Started!");
+        logger.i(TAG, "%s Started!", mName.c_str());
 
         // 暂存当前线程
         sCurrentThread->set(this);

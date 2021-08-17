@@ -51,7 +51,7 @@ void Message::init() {
 }
 
 void Message::recycle() {
-    logger.i(TAG, "Message 等待 recycle.");
+//    logger.i(TAG, "Message 等待 recycle.");
     SmartRecursiveLock lock(mutex, "Message-Mutex");
     if (!this->isInUse) {
         return;
@@ -69,5 +69,5 @@ void Message::recycle() {
     this->isInUse = false;
     sPool = this;
     ++sPoolSize;
-    logger.i(TAG, "Message 已经被 recycle.");
+//    logger.i(TAG, "Message 已经被 recycle.");
 }

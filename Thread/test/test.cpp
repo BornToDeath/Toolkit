@@ -11,6 +11,7 @@
 #include "Message/Message.h"
 #include "Message/MessageQueue.h"
 #include "Looper/Looper.h"
+#include "Thread/HandlerThread.h"
 
 #define TAG "Test"
 
@@ -30,6 +31,8 @@ void looperTest();
 
 void handlerTest();
 
+void handlerThreadTest();
+
 
 int main() {
     prctl(PR_SET_NAME, "MainThread");
@@ -42,11 +45,29 @@ int main() {
 //    messageTest();
 //    messageQueueTest();
 //    looperTest();
-    handlerTest();
+//    handlerTest();
+    handlerThreadTest();
 
     logger.i(TAG, "主线程休眠中...");
 //    pthread_exit(nullptr);
     return 0;
+}
+
+void handlerThreadTest() {
+    auto thread = new HandlerThread("HandlerThread1");
+    thread->start();
+
+    thread->getHandler()->post([]() {
+        logger.i(TAG, "【1】HandlerThread正在执行...");
+    });
+
+    Thread::sleep(1 * 1000);
+    thread->quitThenDeleteSelf(true);
+
+    while (true) {
+        logger.i(TAG, "主线程休眠中...");
+        Thread::sleep(3 * 1000);
+    }
 }
 
 void handlerTest() {

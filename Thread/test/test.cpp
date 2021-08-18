@@ -12,6 +12,7 @@
 #include "Message/MessageQueue.h"
 #include "Looper/Looper.h"
 #include "Thread/HandlerThread.h"
+#include "ThreadPool/ThreadPool.h"
 
 #define TAG "Test"
 
@@ -33,6 +34,8 @@ void handlerTest();
 
 void handlerThreadTest();
 
+void threadPoolTest();
+
 
 int main() {
     prctl(PR_SET_NAME, "MainThread");
@@ -46,11 +49,56 @@ int main() {
 //    messageQueueTest();
 //    looperTest();
 //    handlerTest();
-    handlerThreadTest();
+//    handlerThreadTest();
+    threadPoolTest();
 
     logger.i(TAG, "主线程休眠中...");
 //    pthread_exit(nullptr);
     return 0;
+}
+
+void threadPoolTest() {
+    auto threadPool = ThreadPool::newThreadPool("TP1", 3);
+
+    threadPool->execute("Task1", []() {
+        logger.i(TAG, "任务1正在被执行...");
+        Thread::sleep(1 * 1000);
+        logger.i(TAG, "任务1执行结束...");
+    });
+
+    threadPool->execute("Task2", []() {
+        for (int i = 0; i < 2; ++i) {
+            logger.i(TAG, "任务2正在被执行 | %d", i + 1);
+            Thread::sleep(1 * 1000);
+        }
+    });
+
+    threadPool->execute("Task3", []() {
+        for (int i = 0; i < 3; ++i) {
+            logger.i(TAG, "任务3正在被执行 | %d", i + 1);
+            Thread::sleep(1 * 1000);
+        }
+    });
+
+    threadPool->execute("Task4", []() {
+        for (int i = 0; i < 3; ++i) {
+            logger.i(TAG, "任务4正在被执行 | %d", i + 1);
+            Thread::sleep(1 * 1000);
+        }
+    });
+
+    logger.i(TAG, "线程池大小: %d", threadPool->getThreadCount());
+
+    Thread::sleep(5 * 1000);
+    threadPool->shutDownAndDeleteSelf();
+    threadPool = nullptr;
+
+    Thread::sleep(1*1000);
+
+    while (true) {
+        logger.i(TAG, "主线程休眠中...");
+        Thread::sleep(3 * 1000);
+    }
 }
 
 void handlerThreadTest() {

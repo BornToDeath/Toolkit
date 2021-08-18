@@ -28,7 +28,7 @@ LoopThread::LoopThread() : Thread(), mIsRunning(false) {
 }
 
 LoopThread::~LoopThread() {
-    logger.i(TAG, std::string(mName).append(" ~LoopThread() Called"));
+    logger.i(TAG, std::string(mName).append(" ~LoopThread() called."));
 }
 
 void LoopThread::runTasks() {
@@ -43,7 +43,7 @@ void LoopThread::runTasks() {
 
         Runnable nextTask;
         {
-            // 如果有任务，出栈
+            // 如果有任务，出队列
             std::unique_lock<std::mutex> lock(mQueueMutex);
             nextTask = mTaskQueue.front();
             mTaskQueue.pop();

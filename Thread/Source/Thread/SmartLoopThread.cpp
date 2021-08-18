@@ -18,7 +18,7 @@ SmartLoopThread::~SmartLoopThread() {
 
 SmartLoopThread *SmartLoopThread::newThread() {
     auto thread = new SmartLoopThread();
-    thread->setOnFinishCallback(nullptr);
+    thread->setOnFinishCallback([]() {});
     return thread;
 }
 

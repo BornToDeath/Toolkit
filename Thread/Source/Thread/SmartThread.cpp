@@ -12,7 +12,7 @@ SmartThread *SmartThread::newThread(Runnable runnable) {
     auto *thread = new SmartThread(std::move(runnable));
 
     // 设置结束时的回调（释放自己）
-    thread->setOnFinishCallback(nullptr);
+    thread->setOnFinishCallback([]() {});
     return thread;
 }
 

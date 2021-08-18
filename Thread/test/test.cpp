@@ -13,6 +13,7 @@
 #include "Looper/Looper.h"
 #include "Thread/HandlerThread.h"
 #include "ThreadPool/ThreadPool.h"
+#include "Timer/Timer.h"
 
 #define TAG "Test"
 
@@ -36,6 +37,8 @@ void handlerThreadTest();
 
 void threadPoolTest();
 
+void timerTest();
+
 
 int main() {
     prctl(PR_SET_NAME, "MainThread");
@@ -50,11 +53,23 @@ int main() {
 //    looperTest();
 //    handlerTest();
 //    handlerThreadTest();
-    threadPoolTest();
+//    threadPoolTest();
+    timerTest();
 
     logger.i(TAG, "主线程休眠中...");
 //    pthread_exit(nullptr);
     return 0;
+}
+
+void timerTest() {
+    Timer timer([]() {
+        logger.i(TAG, "我被定时器执行啦");
+    });
+    timer.startDelay(2000);
+    while (true) {
+        logger.i(TAG, "主线程休眠中...");
+        Thread::sleep(3 * 1000);
+    }
 }
 
 void threadPoolTest() {
@@ -93,7 +108,7 @@ void threadPoolTest() {
     threadPool->shutDownAndDeleteSelf();
     threadPool = nullptr;
 
-    Thread::sleep(1*1000);
+    Thread::sleep(1 * 1000);
 
     while (true) {
         logger.i(TAG, "主线程休眠中...");

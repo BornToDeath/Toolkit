@@ -61,10 +61,6 @@ Looper *HandlerThread::getLooper() {
         return nullptr;
     }
 
-    if (looper != nullptr) {
-        return looper;
-    }
-
     {
         std::unique_lock<std::mutex> lock(mutex);
         condition.wait(lock, [this] {
@@ -75,10 +71,8 @@ Looper *HandlerThread::getLooper() {
 }
 
 Handler *HandlerThread::getHandler() {
-    if (handler == nullptr) {
-        // 保证 handler 已经创建好了
-        getLooper();
-    }
+    // 保证 handler 已经创建好了
+    getLooper();
     return handler;
 }
 

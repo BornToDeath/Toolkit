@@ -8,11 +8,11 @@ cd $(dirname $0) || exit
 
 # ========== 一些开关 ==========
 
-# 是否是测试环境
-LOG_TEST="no"
-
 # 单元测试开关
-UNIT_TEST="no"
+UNIT_TEST="yes"
+
+# 覆盖率开关
+COVERAGE="no"
 
 # ============================
 
@@ -43,11 +43,11 @@ else
   echo "MD5不相等，正在重新编译..."
   rm -rf ./build && mkdir ./build && cd ./build || exit
 
-  if [ ${LOG_TEST} == "yes" ]; then
-    if [ ${UNIT_TEST} == "yes" ]; then
-      cmake ../.. -DLOG_TEST=YES -DUNIT_TEST=YES || (echo "cmake失败！" && exit)
+  if [ ${UNIT_TEST} == "yes" ]; then
+    if [ ${COVERAGE} == "yes" ]; then
+      cmake ../.. -DUNIT_TEST=YES -DCOVERAGE=YES || (echo "cmake失败！" && exit)
     else
-      cmake ../.. -DLOG_TEST=YES || (echo "cmake失败！" && exit)
+      cmake ../.. -DUNIT_TEST=YES || (echo "cmake失败！" && exit)
     fi
   else
     cmake ../.. || (echo "cmake失败！" && exit)
@@ -66,7 +66,7 @@ make -j8 || exit
 
 echo "============================================================="
 
-if [ ${LOG_TEST} == "yes" ]; then
+if [ ${UNIT_TEST} == "yes" ]; then
   function onSigInt() {
     echo " ( Ctrl+C ) "
   }
@@ -75,13 +75,13 @@ if [ ${LOG_TEST} == "yes" ]; then
   trap onSigInt INT
 
   # 运行
-  chmod +x ./runLog && ./runLog
+  chmod +x ./runUtils && ./runUtils
 fi
 
 echo "============================================================="
 
 # 统计覆盖率
-if [ ${UNIT_TEST} == "yes" ]; then
+if [ ${COVERAGE} == "yes" ]; then
   echo "覆盖率统计..."
   rm -rf ./覆盖率结果/
   lcov --capture --directory ./ --output-file all.info || exit

@@ -7,7 +7,7 @@ if (NOT INCLUDE_THREAD)
     set(INCLUDE_THREAD YES CACHE STRING DOCSTRING FORCE)
     set(CMAKE_CXX_STANDARD 11)
 
-    if (UNIT_TEST)
+    if (COVERAGE)
         message(STATUS "${PROJECT_NAME} 进行覆盖率统计")
         # 添加覆盖率编译参数
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")

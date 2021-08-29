@@ -5,18 +5,35 @@
 
 #include <iostream>
 #include "ThreadDispatcher.h"
+#include "Threads.h"
 
-
-void testThreadDispatcher();
 
 void sleep(int secs) {
     std::this_thread::sleep_for(std::chrono::seconds(secs));
 }
 
+void testThreadDispatcher();
+
+void testThreads();
+
 
 int main() {
-    testThreadDispatcher();
+//    testThreadDispatcher();
+    testThreads();
     return 0;
+}
+
+void testThreads() {
+    auto runnable = [] {
+        printf("%s\n", "Runnable1 正在被执行...");
+        sleep(3);
+    };
+    const std::string name = "LXQ";
+    Threads::runOnThread(name, runnable);
+    Threads::postOnThread(name, runnable, 1000);
+    sleep(10);
+    Threads::releaseThread(name);
+    sleep(1000000);
 }
 
 void testThreadDispatcher() {

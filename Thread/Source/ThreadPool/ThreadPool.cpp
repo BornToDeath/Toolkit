@@ -107,7 +107,10 @@ void ThreadPool::exeWithIdleThread() {
                 oss << "[" << idleThread->getName() << "] 即将运行任务 [" << task.name << "]";
 //                logger.i("ThreadPool", oss.str());
             }
+
+            // 执行 runnable
             task.runnable();
+
             {
                 std::ostringstream oss;
                 oss << "[" << idleThread->getName() << "] 任务 [" << task.name << "] 执行完毕！";

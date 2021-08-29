@@ -24,7 +24,7 @@ ThreadDispatcher::ThreadDispatcher(const std::string &name, size_t maxConcurrent
     });
 
     concurrentPool = ThreadPool::newThreadPool(name + "-Concurt", maxConcurrentThreadNum, [this]() {
-        threadFlags.set(new int(THREAD_FLAG_BUS));
+        threadFlags.set(new int(THREAD_FLAG_CONCURRENT));
     });
 
     logger.i(TAG, "构造方法执行完毕！");

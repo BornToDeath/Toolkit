@@ -30,6 +30,13 @@ if (NOT INCLUDE_SQLITE3)
             Source
     )
 
+    # 链接的库文件
+    target_link_libraries(
+            ${LIB_NAME}
+            pthread
+            dl
+    )
+
     # 测试
     if (UNIT_TEST)
         add_executable(runSqlite3 test/test.cpp)

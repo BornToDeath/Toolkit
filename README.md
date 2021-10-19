@@ -18,3 +18,7 @@
 | ThreadDispatcher | 线程分发器 |
 | Utils | 一些通用方法 |
 | Zip | Zip 压缩相关 |
+
+# 致谢
+
+本工程很大程度上参考了一位很厉害的同事所写的代码：[木质的旋律](https://www.jianshu.com/u/7342e2f8da4f)

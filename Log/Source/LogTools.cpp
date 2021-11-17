@@ -15,6 +15,10 @@
 /******** 自定义头文件 *********/
 #include "LogTools.h"
 
+/** 定义日志输出到标准输出时的颜色 */
+#define LOG_COLOR_RESET "\033[0m"
+#define LOG_COLOR_RED "\033[31m"
+#define LOG_COLOR_PURPLE "\033[35m"
 
 unsigned long long LogTools::currentTimeMills() {
     std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -39,29 +43,27 @@ void LogTools::printLog(LogLevel level, const char *tag, const char *threadName,
     // 当前时间
     std::string now = LogTools::getCurrentDateTime("%Y-%m-%d %H:%M:%S");
 
-    // 输出到控制台
-    printf("%s | %s | %s | %s | %s\n", now.c_str(), logLevel, tag, threadName, logText);
+    std::ostringstream oss;
+    oss << now
+        << " | " << logLevel
+        << " | " << tag
+        << " | " << threadName
+        << " | " << logText;
 
-//    android_LogPriority priority = ANDROID_LOG_INFO;
-//
-//    switch (level) {
-//        case LogLevel::Debug:
-//            priority = ANDROID_LOG_DEBUG;
-//            break;
-//        case LogLevel::Info:
-//            priority = ANDROID_LOG_INFO;
-//            break;
-//        case LogLevel::Warn:
-//            priority = ANDROID_LOG_WARN;
-//            break;
-//        case LogLevel::Error:
-//            priority = ANDROID_LOG_ERROR;
-//            break;
-//        default:
-//            break;
-//    }
-//
-//    __android_log_print(priority, tag, "%s | %s", threadName, logText);
+    std::string log = oss.str();
+    switch (level) {
+        case LogLevel::Error:
+            log = LOG_COLOR_RED + log + LOG_COLOR_RESET;
+            break;
+        case LogLevel::Warn:
+            log = LOG_COLOR_PURPLE + log + LOG_COLOR_RESET;
+            break;
+        default:
+            break;
+    }
+
+    // 输出到控制台
+    printf("%s\n", log.c_str());
 }
 
 std::string LogTools::getLogStrategyName(LogStrategy strategy) {

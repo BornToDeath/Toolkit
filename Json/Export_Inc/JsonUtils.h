@@ -183,6 +183,22 @@ public:
         return defValue;
     }
 
+    /**
+     * 如果 obj 中的元素是一个 Json::Value 格式的数据，则可通过此方法获取该数据
+     * @param obj
+     * @param name
+     * @return
+     */
+    static Json::Value getJsonValue(const Json::Value &obj, const std::string &name) {
+        Json::Value defValue = Json::nullValue;
+        if (!has(obj, name)) {
+            return defValue;
+        }
+
+        defValue = obj.get(name, defValue);
+        return defValue;
+    }
+
 };
 
 #endif //JSON_JSONUTILS_H

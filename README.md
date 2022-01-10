@@ -7,6 +7,7 @@
 
 | 工具 | 描述 |
 | :--- | :--- |
+| Communication | 基于 HPSocket 实现的 Socket 客户端 |
 | Database | 数据库操作（增删改查），基于 SQLite3 |
 | Json | Json 相关操作 |
 | Log | 日志功能 |

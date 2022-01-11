@@ -99,8 +99,8 @@ void ClientService::init() {
     const unsigned int keepAliveInterval = 1 * 1000;
     client->SetKeepAliveInterval(keepAliveInterval);
 
-    // 设置数据包最大长度（有效数据包最大长度不能超过 4194303/0x3FFFFF 字节，默认：262144/0x40000）
-    client->SetMaxPackSize(0x1FFFFF);
+    // 设置发送文件的最大长度。20220111更新：此值无效！因为修改了HPSocket源码，取消了文件长度限制
+    client->SetMaxPackSize(0x3FFFFF);
 
     // 设置包头标识（有效包头标识取值范围 0 ~ 1023/0x3FF，当包头标识为 0 时不校验包头，默认：0）
     client->SetPackHeaderFlag(0x169);

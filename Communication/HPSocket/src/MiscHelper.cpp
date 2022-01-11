@@ -36,7 +36,7 @@ BOOL AddPackHeader(const WSABUF * pBuffers, int iCount, unique_ptr<WSABUF[]>& bu
 		iLength			   += buf.len;
 	}
 
-	if(iLength == 0 /*|| iLength > dwMaxPackSize*/)
+	if(iLength == 0 || iLength > dwMaxPackSize)
 	{
 		::SetLastError(ERROR_BAD_LENGTH);
 		return FALSE;

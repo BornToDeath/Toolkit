@@ -99,7 +99,7 @@ void ClientService::init() {
     const unsigned int keepAliveInterval = 1 * 1000;
     client->SetKeepAliveInterval(keepAliveInterval);
 
-    // 设置发送文件的最大长度。20220111更新：此值无效！因为修改了HPSocket源码，取消了文件长度限制
+    // 设置发送文件的最大长度
     client->SetMaxPackSize(0x3FFFFF);
 
     // 设置包头标识（有效包头标识取值范围 0 ~ 1023/0x3FF，当包头标识为 0 时不校验包头，默认：0）

@@ -67,6 +67,7 @@ ClientService::~ClientService() {
     if (sendThread) {
         sendThread->quitSafely();
 //        sendThread->quitThenDeleteSelf(true);  // 智能指针不能使用此方法
+        sendThread = nullptr;
     }
 }
 
@@ -281,7 +282,12 @@ void ClientService::send(const BYTE *data, int length, onAfterSendCallback onSuc
         delete[] data;
     };
 
-    sendThread->getHandler()->post(runnable);
+    if (sendThread) {
+        auto handler = sendThread->getHandler();
+        if (handler) {
+            handler->post(runnable);
+        }
+    }
 }
 
 void ClientService::send(int dataType, const BYTE *data, int length, onAfterSendCallback onSucceed, onAfterSendCallback onFailed) {

@@ -77,7 +77,7 @@ void Looper::quit() {
 }
 
 void Looper::quitSafely() {
-    queue->quit(true);
+    queue->quit(false);
 }
 
 void Looper::setName(const std::string &name) {

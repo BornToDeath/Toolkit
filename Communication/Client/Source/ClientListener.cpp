@@ -69,7 +69,13 @@ EnHandleResult ClientListener::OnReceive(ITcpClient *pSender, CONNID dwConnID, c
         NotificationCenter::defaultCenter->postNotification("onReceiveSocketData", &socketData);
     };
 
-    dataHandleThread->getHandler()->post(runnable);
+    if (dataHandleThread) {
+        auto handler = dataHandleThread->getHandler();
+        if (handler) {
+            handler->post(runnable);
+        }
+    }
+
     return HR_OK;
 }
 

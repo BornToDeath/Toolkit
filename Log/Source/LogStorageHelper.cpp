@@ -15,6 +15,7 @@
 #include <cstring>
 #include <climits>
 #include <utility>
+#include <iomanip>
 
 /**
  * 自定义头文件
@@ -214,16 +215,22 @@ bool LogStorageHelper::renameLogFile() {
 
     this->updateLogFileParams();
 
+    // 文件索引。设置字段宽度为3，不足补0
     long curFileMaxIndex = this->logFileMaxIndex + 1;
+    std::ostringstream indexOss;
+    indexOss << std::setw(3) << std::setfill('0') << curFileMaxIndex;
+
+    // 当前时间戳
     std::string nowDate = LogTools::getCurrentDateTime("%Y%m%d%H%M%S");
 
-    // 重命名后的日志文件名。示例：log_123_20210127123050.txt
+    // 重命名后的日志文件名。示例：log_012_20210127123050.254.txt
     std::ostringstream oss;
     oss << this->logFileDir
-        << LOG_FILE_PRE
-        << std::to_string(curFileMaxIndex) << "_"
-        << nowDate
-        << LOG_FILE_SUF;
+    << LOG_FILE_PRE
+    << indexOss.str()
+    << "_"
+    << nowDate
+    << LOG_FILE_SUF;
 
     std::string newLogFileName = oss.str();
 

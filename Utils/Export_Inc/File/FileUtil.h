@@ -26,6 +26,13 @@ public:
     static bool isFileExist(const char *filePath);
 
     /**
+     * 判断文件夹是否存在
+     * @param folderPath
+     * @return
+     */
+    static bool isFolderExist(const char *folderPath);
+
+    /**
      * 获取文件 MD5 值
      * @param filePath
      * @return

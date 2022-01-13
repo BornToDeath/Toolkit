@@ -14,6 +14,10 @@ bool FileUtil::isFileExist(const char *const filePath) {
     return 0 == access(filePath, F_OK);
 }
 
+bool FileUtil::isFolderExist(const char *const folderPath) {
+    return 0 == access(folderPath, F_OK);
+}
+
 std::string FileUtil::getFileMD5(const char *filePath) {
     std::string md5;
     if (filePath == nullptr) {

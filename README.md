@@ -18,7 +18,8 @@
 | Thread | 线程相关 |
 | ThreadDispatcher | 线程分发器 |
 | Utils | 一些通用方法 |
-| Zip | Zip 压缩相关 |
+| Zip | Zip 解压缩三方库 |
+| ZipWrapper | 基于 Zip 封装了一套接口，方便解压缩 |
 
 # 致谢
 

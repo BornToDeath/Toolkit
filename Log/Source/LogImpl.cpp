@@ -151,10 +151,10 @@ bool LogImpl::fetchLogAndWrite() {
 
             // 线程阻塞，直到日志队列不为空
             logConsumeCondition.wait(lock, [this]() {
-                if (isQuit) {
+                if (!this->logQueue.empty() || isQuit) {
                     return true;
                 }
-                return !this->logQueue.empty();
+                return false;
             });
 
             // 是否退出循环
@@ -172,13 +172,17 @@ bool LogImpl::fetchLogAndWrite() {
     }
 
     if (DEBUG) {
-        LogTools::printLog(LogLevel::Info, TAG, LOG_THREAD_NAME, ">>> 日志线程退出！");
+        LogTools::printLog(LogLevel::Info, TAG, LOG_THREAD_NAME, ">>> 退出日志循环！");
     }
 
     return true;
 }
 
 bool LogImpl::writeLog(const std::shared_ptr<LogData> &logData) {
+
+    if (!logData) {
+        return true;
+    }
 
     std::string encryptedLogText;
 

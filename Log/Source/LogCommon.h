@@ -33,8 +33,7 @@
 
 /**
  * 历史日志文件所能占用的总的磁盘大小。单位：Byte
- * 由于日志文件是 2M 一个，而日志所能用的的磁盘大小是 60MB，所以日志文件个数最大值是 30 个
- * 考虑到 current.txt 也占用 2MB ，历史日志只能占用 58MB 。
+ * 考虑到 current.txt 也占用 LOG_MMAP_LEN MB ，历史日志只能占用 (LOG_FILE_TOTAL_DISK_SIZE - LOG_MMAP_LEN) MB 。
  */
 #ifndef LOG_FILE_TOTAL_DISK_SIZE
 #define LOG_FILE_TOTAL_DISK_SIZE (58 * 1024 * 1024)  // 58MB
@@ -45,14 +44,6 @@
  */
 #ifndef LOG_MEMORY_LEN
 #define LOG_MEMORY_LEN (4 * 1024) // 4KB
-#endif
-
-/**
- * 日志文件所在目录。注意：最后的斜杠必须存在
- * 此目录无效，仅测试用，因为日志根目录是上游指定的
- */
-#ifndef LOG_FILE_DIR
-#define LOG_FILE_DIR "/home/lxq271332/AIDot/logs/"
 #endif
 
 

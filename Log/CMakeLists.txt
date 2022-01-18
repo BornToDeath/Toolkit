@@ -7,12 +7,10 @@ if (NOT INCLUDE_LOG)
     set(INCLUDE_LOG YES CACHE STRING DOCSTRING FORCE)
     set(CMAKE_CXX_STANDARD 11)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+    #    add_compile_options(-fPIC)
 
-    # 单元测试
-    if (UNIT_TEST)
-        message(STATUS "${PROJECT_NAME} 进行覆盖率统计")
-        # 添加覆盖率编译参数
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
+    if (CMAKE_BUILD_TYPE MATCHES "DEBUG")
+        ADD_DEFINITIONS(-DBUILD_TYPE_DEBUG)
     endif ()
 
     aux_source_directory(Source LOG_SRCS)
@@ -22,14 +20,13 @@ if (NOT INCLUDE_LOG)
             Export_Inc
     )
 
-    # 测试
-    if (LOG_TEST)
-        add_definitions(-DBUILD_TYPE_DEBUG)
+    # -------------------- 测试 --------------------
+    function(testLog)
+        add_compile_options(-g)
+        # 编译成可执行程序
         add_executable(runLog test/test.cpp)
-        target_link_libraries(
-                runLog
-                Log_static
-        )
-    endif ()
+        target_link_libraries(runLog Log_static)
+    endfunction()
+    #    testLog()
 
 endif ()

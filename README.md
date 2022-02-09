@@ -18,7 +18,7 @@
 | Thread | 线程相关 |
 | ThreadDispatcher | 线程分发器 |
 | Utils | 一些常用方法，包括字符串、文件、时间等 |
-| ZipWrapper | 基于 libzip 三方库封装了一套压缩/解压缩接口，方便使用 |
+| ZipWrapper | 压缩/解压缩，基于 libzip 三方库 |
 
 # 致谢
 

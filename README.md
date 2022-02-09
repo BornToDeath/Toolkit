@@ -18,9 +18,8 @@
 | Thread | 线程相关 |
 | ThreadDispatcher | 线程分发器 |
 | Utils | 一些通用方法 |
-| Zip | Zip 解压缩三方库 |
-| ZipWrapper | 基于 Zip 封装了一套接口，方便解压缩 |
+| ZipWrapper | 基于 libzip 三方库封装了一套压缩/解压缩接口，方便使用 |
 
 # 致谢
 
-本工程很大程度上参考了一位很厉害的同事所写的代码：[木质的旋律](https://www.jianshu.com/u/7342e2f8da4f)
+本工程的部分工具参考了一位很厉害的同事所写的代码：[木质的旋律](https://www.jianshu.com/u/7342e2f8da4f)

@@ -8,26 +8,17 @@ if (NOT _INCLUDE_ZIP_WRAPPER_)
 	set(CMAKE_CXX_STANDARD 14)
 
 	# 本工程的源文件
-	aux_source_directory(Source ZIPWRAPPER_SRCS)
+	file(GLOB_RECURSE ZIP_SRCS Source/*.c Source/*.cpp)
 
 	# 编译成静态库
 	set(ZIPWRAPPER_LIB_NAME ZipWrapper_static)
-	add_library(${ZIPWRAPPER_LIB_NAME} STATIC ${ZIPWRAPPER_SRCS})
+	add_library(${ZIPWRAPPER_LIB_NAME} STATIC ${ZIP_SRCS})
 
 	# 本工程头文件引用路径
 	target_include_directories(
 			${ZIPWRAPPER_LIB_NAME} PUBLIC
 			Export_Inc
-			../../ThirdPartyLayer/Zip/Source
-	)
-
-	# 本工程引用的外部项目
-	add_subdirectory(../../ThirdPartyLayer/Zip Zip.out)
-
-	# 链接的库文件
-	target_link_libraries(
-			${ZIPWRAPPER_LIB_NAME}
-			Zip_static
+			Source/Zip
 	)
 
 	# 测试

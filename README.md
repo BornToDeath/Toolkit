@@ -7,17 +7,17 @@
 
 | 工具 | 描述 |
 | :--- | :--- |
-| Communication | 基于 HPSocket 实现的 Socket 客户端 |
+| Communication | 基于 HPSocket 实现的 Socket 通信机制 |
 | Database | 数据库操作（增删改查），基于 SQLite3 |
-| Json | Json 相关操作 |
-| Log | 日志功能 |
+| Json | Json 数据格式相关操作 |
+| Log | 日志功能，包括日志存储和加密 |
 | Network | 网络相关 |
 | NotificationCenter | 消息通知 |
-| SharedPreference | 类似安卓的 SharedPreference |
+| SharedPreference | 共享存储，类似安卓的 SharedPreference |
 | SQLite3 | SQLite 数据库，基于 sqlite3 三方库|
 | Thread | 线程相关 |
 | ThreadDispatcher | 线程分发器 |
-| Utils | 一些通用方法 |
+| Utils | 一些常用方法，包括字符串、文件、时间等 |
 | ZipWrapper | 基于 libzip 三方库封装了一套压缩/解压缩接口，方便使用 |
 
 # 致谢

@@ -45,9 +45,20 @@ namespace Test {
         std::cout << "读取json文件成功！" << std::endl;
         std::cout << root.asString() << std::endl;
     }
+
+    void testJson3() {
+        const std::string jsonStr = R"({"code":"J000000","description":"注册成功","resultMap":{},"success":true})";
+        Json::Value obj;
+        bool isOk = JsonUtils::string2JsonValue(obj, jsonStr);
+        if (isOk) {
+            std::cout << "成功！" << std::endl;
+        } else {
+            std::cout << "失败！" << std::endl;
+        }
+    }
 }
 
 int main() {
-    Test::testJson2();
+    Test::testJson3();
     return 0;
 }

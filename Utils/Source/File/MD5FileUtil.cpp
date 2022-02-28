@@ -3,7 +3,8 @@
 //
 
 #include <cstdio>
-#include <malloc.h>
+//#include <malloc.h>
+#include <cstdlib>
 #include <cstring>
 #include "MD5FileUtil.h"
 

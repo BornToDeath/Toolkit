@@ -38,6 +38,12 @@ public:
      */
     static int string2Int(const std::string &obj);
 
+    /**
+     * 去除首尾空格
+     * @param str
+     */
+    static void trim(std::string &str);
+
 public:
 
     StringUtil() = delete;

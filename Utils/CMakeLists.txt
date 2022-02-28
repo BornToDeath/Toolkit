@@ -26,11 +26,12 @@ if (NOT INCLUDE_UTILS)
             Export_Inc
     )
 
-#    # =================== 测试 ===================
-#    if (UNIT_TEST)
-#        # 编译成可执行程序
-#        add_executable(runUtils test/test.cpp)
-#        target_link_libraries(runUtils Utils_static)
-#    endif ()
+    # =================== 测试 ===================
+    function(testUtils)
+        # 编译成可执行程序
+        add_executable(runUtils test/test.cpp)
+        target_link_libraries(runUtils Utils_static)
+    endfunction()
+#    testUtils()
 
 endif ()

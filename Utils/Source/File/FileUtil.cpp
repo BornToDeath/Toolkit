@@ -6,8 +6,9 @@
 #include <sys/stat.h>
 #include <fstream>
 #include <string>
+#include <dirent.h>
 #include "File/FileUtil.h"
-#include "File/MD5FileUtil.h"
+#include "MD5FileUtil.h"
 
 
 bool FileUtil::isFileExist(const char *const filePath) {
@@ -112,4 +113,25 @@ std::string FileUtil::getFirstLine(const std::string &filePath) {
     // 读取文件第一行内容
     getline(input, line);
     return line;
+}
+
+
+void FileUtil::deleteAllFiles(const std::string &folder) {
+    if (folder.empty() || !isFolderExist(folder.c_str())) {
+        return;
+    }
+
+    DIR *dir = opendir(folder.c_str());
+    if (dir == nullptr) {
+        return;
+    }
+
+    // 遍历目录
+    struct dirent *ent;
+    while ((ent = readdir(dir)) != nullptr) {
+        std::string filePath = folder + ent->d_name;
+        ::remove(filePath.c_str());
+    }
+    closedir(dir);
+
 }

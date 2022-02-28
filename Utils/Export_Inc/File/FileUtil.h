@@ -87,6 +87,12 @@ public:
      */
     static std::string getFirstLine(const std::string &filePath);
 
+    /**
+     * 删除指定目录下的所有文件。不能递归！
+     * @param folder
+     */
+    static void deleteAllFiles(const std::string &folder);
+
 public:
 
     FileUtil() = delete;

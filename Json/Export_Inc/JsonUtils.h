@@ -3,6 +3,7 @@
 #define JSON_JSONUTILS_H
 
 #include <sstream>
+#include <fstream>
 #include "json/json.h"
 
 
@@ -16,7 +17,7 @@ public:
     /**
      * 将一个 Json 字符串转为 Json::Value.
      */
-    static bool string2JsonValue(Json::Value& outValue, const std::string& json) {
+    static bool string2JsonValue(Json::Value &outValue, const std::string &json) {
         Json::Reader reader;
         return reader.parse(json, outValue, false);
     }
@@ -24,7 +25,7 @@ public:
     /**
      * 判断 obj 中是否包含指定 name 的元素。
      */
-    static inline bool has(const Json::Value& obj, const std::string& name) {
+    static inline bool has(const Json::Value &obj, const std::string &name) {
         return obj.isMember(name);
     }
 
@@ -33,7 +34,7 @@ public:
      * 如果不存在，返回 defValue 。
      * 如果 name 对应的字段不是一个 int 类型，且无法自动转换，返回 defValue 。
      */
-    static int getInt(const Json::Value& obj, const std::string& name, int defValue) {
+    static int getInt(const Json::Value &obj, const std::string &name, int defValue) {
         if (!has(obj, name)) {
             return defValue;
         }
@@ -51,7 +52,7 @@ public:
      * 如果不存在，返回 defValue 。
      * 如果 name 对应的字段不是一个 bool 类型，且无法自动转换，返回 defValue 。
      */
-    static bool getBool(const Json::Value& obj, const std::string& name, bool defValue) {
+    static bool getBool(const Json::Value &obj, const std::string &name, bool defValue) {
         if (!has(obj, name)) {
             return defValue;
         }
@@ -71,7 +72,7 @@ public:
                 return true;
             }
         }
-        // 如果是 数字
+            // 如果是 数字
         else if (temp.isNumeric()) {
             int i = temp.asInt();
             if (i == 0) {
@@ -90,7 +91,7 @@ public:
      * 如果不存在，返回 defValue 。
      * 如果 name 对应的字段不是一个 double 类型，且无法自动转换，返回 defValue 。
      */
-    static double getDouble(const Json::Value& obj, const std::string& name, double defValue) {
+    static double getDouble(const Json::Value &obj, const std::string &name, double defValue) {
         if (!has(obj, name)) {
             return defValue;
         }
@@ -108,7 +109,7 @@ public:
      * 如果不存在，返回 defValue 。
      * 如果 name 对应的字段不是一个 string 类型，且无法自动转换，返回 defValue 。
      */
-    static std::string getString(const Json::Value& obj, const std::string& name, std::string defValue) {
+    static std::string getString(const Json::Value &obj, const std::string &name, std::string defValue) {
         if (!has(obj, name)) {
             return defValue;
         }
@@ -144,7 +145,7 @@ public:
      * 如果不存在，返回 defValue 。
      * 如果 name 对应的字段不是一个 unsigned int 类型，且无法自动转换，返回 defValue 。
      */
-    static unsigned int getUnsignedInt(const Json::Value& obj, const std::string& name, unsigned int defValue) {
+    static unsigned int getUnsignedInt(const Json::Value &obj, const std::string &name, unsigned int defValue) {
         if (!has(obj, name)) {
             return defValue;
         }
@@ -157,7 +158,8 @@ public:
         return defValue;
     }
 
-    static unsigned long long getULongLong(const Json::Value& obj, const std::string& name, unsigned long long defValue) {
+    static unsigned long long
+    getULongLong(const Json::Value &obj, const std::string &name, unsigned long long defValue) {
         if (!has(obj, name)) {
             return defValue;
         }
@@ -170,7 +172,7 @@ public:
         return defValue;
     }
 
-    static long long getLongLong(const Json::Value& obj, const std::string& name, long long defValue) {
+    static long long getLongLong(const Json::Value &obj, const std::string &name, long long defValue) {
         if (!has(obj, name)) {
             return defValue;
         }
@@ -197,6 +199,28 @@ public:
 
         defValue = obj.get(name, defValue);
         return defValue;
+    }
+
+    /**
+     * 从一个 Json 文件中读取内容并转换为 Json::Value 格式。
+     * 注意：文件必须存在且文件中 Json 字符串必须是没有被格式化的，否则会失败！
+     * @param filePath
+     * @param obj
+     * @return
+     */
+    static bool readJsonFile(const std::string &filePath, Json::Value &obj) {
+        std::ifstream ifs(filePath);
+        if (!ifs.is_open()) {
+            return false;
+        }
+        std::string content((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+        ifs.close();
+        if (content.empty()) {
+            return false;
+        }
+
+        Json::Value root;
+        return string2JsonValue(root, content);
     }
 
 };

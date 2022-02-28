@@ -1,0 +1,1 @@
+{"libs":[{"name":"libAIDotBusiness.so","version":"103"}],"models":[{"name":"drip_noise_cls.bin","version":""},{"name":"mask_net.bin","version":""},{"name":"pot_noise_cls.bin","version":""},{"name":"rcnn.bin","version":""},{"name":"rpn.bin","version":""},{"name":"A_model_package_info.json"}]}

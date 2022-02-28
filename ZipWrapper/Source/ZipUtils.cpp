@@ -127,6 +127,67 @@ int ZipUtils::writeData(unzFile &zipfile, const char *destPathName) {
     return 0;
 }
 
+bool ZipUtils::unZipFileByName(const std::string &zipFilePath, const std::string &fileName,
+                               const std::string &destFolder) {
+    if (zipFilePath.empty() || fileName.empty()) {
+        log("zipFilePath.empty() || fileName.empty()");
+        return false;
+    }
+    if (!isFileExist(zipFilePath.c_str())) {
+        log("压缩文件不存在：%s", zipFilePath.c_str());
+        return false;
+    }
+    if (!isFolderExist(destFolder.c_str())) {
+        log("解压到的目录不存在：%s", destFolder.c_str());
+        return false;
+    }
+
+    // 1. 打开zip文件
+    unzFile fileHandle = unzOpen(zipFilePath.c_str());
+    if (fileHandle == nullptr) {
+        log("unzOpen failed");
+        return false;
+    }
+
+    // 2.1 定位到指定文件
+    if (unzLocateFile(fileHandle, fileName.c_str(), 1) != UNZ_OK) {
+        log("unzLocateFile failed of the file: %s", fileName.c_str());
+        return false;
+    }
+
+    // 2.2 获取当前内部压缩文件的信息
+    unz_file_info64 file_info64;
+    char fileNameBuf[512] = {0};
+    int isOk = unzGetCurrentFileInfo64(fileHandle, &file_info64, fileNameBuf, sizeof(fileNameBuf), nullptr, 0,
+                                       nullptr, 0);
+    if (isOk != UNZ_OK) {
+        log("unzGetCurrentFileInfo failed");
+        unzClose(fileHandle);
+        return false;
+    }
+
+    // 2.3 打开当前内部压缩文件
+    if (unzOpenCurrentFile(fileHandle) != UNZ_OK) {
+        log("unzOpenCurrentFile failed");
+        unzClose(fileHandle);
+        return false;
+    }
+
+    // 2.4 解析当前文件到指定文件夹
+    char name[1024] = {0};
+    sprintf(name, "%s/%s", destFolder.c_str(), fileNameBuf);
+    if (writeData(fileHandle, name) < 0) {
+        log("writeData failed");
+        unzCloseCurrentFile(fileHandle);
+        unzClose(fileHandle);
+        return false;
+    }
+
+    unzCloseCurrentFile(fileHandle);
+    unzClose(fileHandle);
+    return true;
+}
+
 bool ZipUtils::unZipFileByNames(const std::string &zipFilePath, const std::vector<std::string> &fileNames,
                                 const std::string &destFolder) {
     if (zipFilePath.empty() || fileNames.empty()) {

@@ -20,7 +20,19 @@ public:
     static bool unZipFile(const std::string &zipFilePath, const std::string &destFolder);
 
     /**
+     * 解压 Zip 文件中指定名称的单个文件
+     * 注意：待解压的文件必须是在压缩文件的根目录下，否则解压失败！
+     * @param zipFilePath
+     * @param fileName
+     * @param destFolder
+     * @return
+     */
+    static bool unZipFileByName(const std::string &zipFilePath, const std::string &fileName,
+                                const std::string &destFolder);
+
+    /**
      * 解压 Zip 文件中的若干指定名称的文件
+     * 注意：待解压的文件必须是在压缩文件的根目录下，否则解压失败！
      * @param zipFilePath
      * @param destFolder
      * @return

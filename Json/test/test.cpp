@@ -35,7 +35,7 @@ namespace Test {
 
     void testJson2() {
         std::cout << __PRETTY_FUNCTION__ << std::endl;
-        const std::string filePath = "/Users/lixiaoqing/Desktop/Projects/Toolkit/Json/test/upgrade.json";
+        const std::string filePath = "/Users/lixiaoqing/Desktop/Projects/Toolkit/Json/test/test.json";
         Json::Value root;
         bool isOk = JsonUtils::readJsonFile(filePath, root);
         if(!isOk) {
@@ -43,7 +43,9 @@ namespace Test {
             return;
         }
         std::cout << "读取json文件成功！" << std::endl;
-        std::cout << root.asString() << std::endl;
+
+        // 再转为 string
+        std::cout << JsonUtils::jsonValue2String(root) << std::endl;
     }
 
     void testJson3() {
@@ -59,6 +61,6 @@ namespace Test {
 }
 
 int main() {
-    Test::testJson3();
+    Test::testJson2();
     return 0;
 }

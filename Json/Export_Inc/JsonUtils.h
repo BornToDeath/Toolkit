@@ -202,8 +202,7 @@ public:
     }
 
     /**
-     * 从一个 Json 文件中读取内容并转换为 Json::Value 格式。
-     * 注意：文件必须存在且文件中 Json 字符串必须是没有被格式化的，否则会失败！
+     * 从一个 Json 文件中读取内容并转换为 Json::Value 格式
      * @param filePath
      * @param obj
      * @return
@@ -219,8 +218,16 @@ public:
             return false;
         }
 
-        Json::Value root;
-        return string2JsonValue(root, content);
+        return string2JsonValue(obj, content);
+    }
+
+    /**
+     * Json::Value 转 string
+     * @param obj
+     * @return
+     */
+    static std::string jsonValue2String(const Json::Value &obj) {
+        return Json::FastWriter().write(obj);
     }
 
 };

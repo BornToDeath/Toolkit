@@ -274,7 +274,7 @@ int ZipUtils::unZipFileInMemory(std::string zipFilePath, std::map<std::string, u
     //解析zip文件
     unz_file_info ufi;
     unz_file_info *pFileInfo = &ufi;
-    int MAX_PATH = 256;
+    const int MAX_PATH = 256;
     //存放从zip中解析出来的内部文件
     char szZipFName[MAX_PATH];
     for (int i = 0; i < pGlobalInfo->number_entry; i++) {

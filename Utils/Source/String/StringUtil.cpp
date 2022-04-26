@@ -4,6 +4,7 @@
 
 #include <cstring>
 #include "String/StringUtil.h"
+#include "MD5.h"
 
 
 bool StringUtil::compare(const std::string &s1, const std::string &s2) {
@@ -30,4 +31,13 @@ void StringUtil::trim(std::string &str) {
     }
     str.erase(0, str.find_first_not_of(' '));
     str.erase(str.find_last_not_of(' ') + 1);
+}
+
+std::string StringUtil::getMD5(const std::string &str) {
+    if (str.empty()) {
+        return "";
+    }
+    MD5 md5;
+    md5.update(str);
+    return md5.toString();
 }

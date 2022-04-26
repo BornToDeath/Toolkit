@@ -44,6 +44,12 @@ public:
      */
     static void trim(std::string &str);
 
+    /**
+     * 获取字符串的 MD5 值
+     * @param str
+     */
+    static std::string getMD5(const std::string &str);
+
 public:
 
     StringUtil() = delete;

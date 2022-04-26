@@ -1,4 +1,6 @@
 #include "MD5.h"
+#include <cstring>
+#include <algorithm>
 
 using namespace std;
 

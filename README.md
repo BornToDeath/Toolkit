@@ -13,10 +13,11 @@
 | Log | 日志功能，包括日志存储和加密 |
 | Network | 网络相关 |
 | NotificationCenter | 消息通知 |
-| SharedPreference | 共享存储，类似安卓的 SharedPreference |
 | SQLite3 | SQLite 数据库，基于 sqlite3 三方库|
+| SharedPreference | 共享存储，类似安卓的 SharedPreference |
 | Thread | 线程相关 |
 | ThreadDispatcher | 线程分发器 |
+| ThreadPool | 非常简洁的线程池 |
 | Utils | 一些常用方法，包括字符串、文件、时间等 |
 | ZipWrapper | 压缩/解压缩，基于 libzip 三方库 |
 

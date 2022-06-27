@@ -65,9 +65,14 @@ ClientService::~ClientService() {
     this->disconnect();
 
     if (sendThread) {
-        sendThread->quitSafely();
-//        sendThread->quitThenDeleteSelf(true);  // 智能指针不能使用此方法
-        sendThread = nullptr;
+        {
+            std::unique_lock<std::mutex> lock(sendThreadMutex);
+            if (sendThread) {
+                sendThread->quitSafely();
+//                sendThread->quitThenDeleteSelf(true);  // 智能指针不能使用此方法
+                sendThread = nullptr;
+            }
+        }
     }
 }
 
@@ -215,8 +220,9 @@ void ClientService::send(const BYTE *data, int length, onAfterSendCallback onSuc
             sendThread = std::make_shared<HandlerThread>("SendThread");
             // 启动 HandlerThread
             sendThread->start();
-            Log::info(TAG, "启动数据发送线程: SendThread");
         }
+        lock.unlock();
+        Log::info(TAG, "启动数据发送线程: SendThread");
     }
 
     // 发送数据
@@ -283,7 +289,13 @@ void ClientService::send(const BYTE *data, int length, onAfterSendCallback onSuc
     };
 
     if (sendThread) {
-        auto handler = sendThread->getHandler();
+        Handler* handler = nullptr;
+        {
+            std::unique_lock<std::mutex> lock(sendThreadMutex);
+            if (sendThread) {
+                handler = sendThread->getHandler();
+            }
+        }
         if (handler) {
             handler->post(runnable);
         }

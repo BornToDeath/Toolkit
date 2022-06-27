@@ -111,6 +111,10 @@ private:
      */
     std::mutex dataHandleThreadMutex;
 
+    /**
+     * 是否停止接收 Socket 数据
+     */
+    std::atomic<bool> isStopped;
 };
 
 

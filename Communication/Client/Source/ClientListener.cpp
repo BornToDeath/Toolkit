@@ -14,11 +14,14 @@
 
 
 ClientListener::ClientListener() : dataHandleThread(nullptr) {
+    isStopped.store(false);
 }
 
 ClientListener::~ClientListener() {
     Log::info(TAG, "【析构】%s", __PRETTY_FUNCTION__);
+    isStopped.store(true);
     if (dataHandleThread) {
+        std::unique_lock<std::mutex> lock(dataHandleThreadMutex);
         dataHandleThread->quitSafely();
         dataHandleThread = nullptr;
     }
@@ -46,6 +49,10 @@ EnHandleResult ClientListener::OnReceive(ITcpClient *pSender, CONNID dwConnID, c
      * 2. 由于是在它处处理接收到的数据，所以需要先将数据备份，否则数据会被 socket 线程释放
      */
 
+    if (isStopped.load()) {
+        return HR_IGNORE;
+    }
+
     // 先备份一份数据
     auto data = new BYTE[iLength]();
     ::memcpy(data, pData, iLength);
@@ -70,7 +77,13 @@ EnHandleResult ClientListener::OnReceive(ITcpClient *pSender, CONNID dwConnID, c
     };
 
     if (dataHandleThread) {
-        auto handler = dataHandleThread->getHandler();
+        Handler *handler = nullptr;
+        {
+            std::unique_lock<std::mutex> lock(dataHandleThreadMutex);
+            if (dataHandleThread) {
+                handler = dataHandleThread->getHandler();
+            }
+        }
         if (handler) {
             handler->post(runnable);
         }

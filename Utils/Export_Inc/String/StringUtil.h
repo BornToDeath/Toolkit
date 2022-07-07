@@ -6,7 +6,7 @@
 #define UTILS_STRINGUTIL_H
 
 #include <iostream>
-
+#include <vector>
 
 /**
  * 字符串工具类
@@ -49,6 +49,14 @@ public:
      * @param str
      */
     static std::string getMD5(const std::string &str);
+
+    /**
+     * 按固定字符分割字符串
+     * @param str
+     * @param sep
+     * @return
+     */
+    static std::vector<std::string> split(const std::string &str, const char sep);
 
 public:
 

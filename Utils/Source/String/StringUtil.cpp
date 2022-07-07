@@ -3,6 +3,7 @@
 //
 
 #include <cstring>
+#include <sstream>
 #include "String/StringUtil.h"
 #include "MD5.h"
 
@@ -40,4 +41,19 @@ std::string StringUtil::getMD5(const std::string &str) {
     MD5 md5;
     md5.update(str);
     return md5.toString();
+}
+
+std::vector<std::string> StringUtil::split(const std::string &str, const char sep) {
+    if (str.empty()) {
+        return {};
+    }
+    std::vector<std::string> ans;
+    std::istringstream iss(str);
+    std::string word;
+    while (getline(iss, word, sep)) {
+        if (!word.empty()) {
+            ans.emplace_back(word);
+        }
+    }
+    return ans;
 }

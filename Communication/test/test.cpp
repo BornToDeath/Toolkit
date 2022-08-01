@@ -9,6 +9,7 @@
 #include "Log.h"
 #include "IClientService.h"
 #include "DataWrapper.h"
+#include "IServerService.h"
 
 #define TAG "Test"
 
@@ -105,23 +106,28 @@ namespace Test {
 //    int outputType = static_cast<std::underlying_type<DataType>::type>(type);
 //    Log::info(TAG, "输出类型=%d", outputType);
     }
+
+    void serverTest() {
+        auto server = IServerService::getSingleton();
+        if (server == nullptr) {
+            Log::error(TAG, "server is nullptr");
+            return;
+        }
+        Log::info(TAG, "start server...");
+        server->start("127.0.0.1", 9001);
+    }
 }
 
 int main() {
-
-    std::string logRootDir = "/mnt/aidot/logs/";
-    Log::init(logRootDir.c_str());
 
     // 设置线程名
     ::prctl(PR_SET_NAME, "SocketTest");
 
     // 测试
-    Test::connection();
+    Test::serverTest();
 
     Log::info(TAG, "主程序休眠中...");
     std::this_thread::sleep_for(std::chrono::seconds(100));
-    Log::info(TAG, "即将释放 socket 资源");
-    IClientService::releaseSingleton();
     Log::info(TAG, "进程退出...");
     return 0;
 }

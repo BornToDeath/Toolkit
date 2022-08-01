@@ -7,6 +7,11 @@ if (NOT INCLUDE_COMMUNICATION)
     message(STATUS "正在编译 ${PROJECT_NAME}")
     set(INCLUDE_COMMUNICATION YES CACHE STRING DOCSTRING FORCE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+    set(CMAKE_CXX_STANDARD 14)
+
+    if (CMAKE_BUILD_TYPE MATCHES "DEBUG")
+        add_compile_options(-g)
+    endif()
 
     # 覆盖率统计
     if (COVERAGE)
@@ -16,7 +21,7 @@ if (NOT INCLUDE_COMMUNICATION)
     endif ()
 
     # 本工程的源文件
-    file(GLOB_RECURSE COMMUNICATION_SRCS Client/Source/*.cpp)
+    file(GLOB_RECURSE COMMUNICATION_SRCS Client/Source/*.cpp Server/Source/*.cpp)
 
     # 编译成静态库
     add_library(Communication_static STATIC ${COMMUNICATION_SRCS})
@@ -27,6 +32,7 @@ if (NOT INCLUDE_COMMUNICATION)
             Client/Export_Inc
             Client/Source
             HPSocket/include
+            Server/Export_Inc
             ../Log/Export_Inc
             ../NotificationCenter/headers
             ../Utils/Export_Inc

@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.4.1)
+project(LockFreeQueue)
+set(CMAKE_CXX_STANDARD 11)
+#set(CMAKE_C_COMPILER "/usr/bin/gcc")
+#set(CMAKE_CXX_COMPILER "/usr/bin/g++")
+add_compile_options(-g)
+add_executable(runTest test/test.cpp)
+target_include_directories(runTest PUBLIC inc)

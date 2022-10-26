@@ -10,6 +10,7 @@
 | Communication | 基于 HPSocket 实现的 Socket 通信机制 |
 | Database | 数据库操作（增删改查），基于 SQLite3 |
 | Json | Json 数据格式相关操作 |
+| LockFreeQueue | 无锁队列 |
 | Log | 日志功能，包括日志存储和加密 |
 | Network | 网络相关 |
 | NotificationCenter | 消息通知 |

@@ -26,22 +26,22 @@ public:
     static float getGPUTemperature();
 
     /**
-     * 获取设备总内存大小。单位：KB
+     * 获取设备总内存大小。单位：B
      * @return
      */
-    static int getMemoryTotal();
+    static unsigned int getMemoryTotal();
 
     /**
-     * 获取设备当前内存占用大小。单位：KB
+     * 获取设备当前内存占用大小。单位：B
      * @return
      */
-    static int getMemoryUsage();
+    static unsigned int getMemoryUsage();
 
     /**
-     * 获取设备当前可用内存大小。单位：KB
+     * 获取设备当前可用内存大小。单位：B
      * @return
      */
-    static int getMemoryFree();
+    static unsigned int getMemoryFree();
 
     /**
      * 执行 shell 命令
@@ -49,6 +49,32 @@ public:
      * @return 命令执行结果
      */
     static std::string executeCommand(const char *cmd);
+
+    /**
+     * 获取指定进程占用的内存。单位：B
+     * @param pid
+     * @return
+     */
+    static unsigned int getMemoryUsageByPid(int pid);
+
+    /**
+     * 获取指定进程的进程名
+     * @param pid
+     * @return
+     */
+    static std::string getNameByPid(int pid);
+
+    /**
+     * 获取逻辑 CPU 核数
+     * @return
+     */
+    static int getLogicalCpuCoreCount();
+
+    /**
+     * 获取 CPU 在线核数
+     * @return
+     */
+    static int getOnlineCpuCoreCount();
 
 public:
 

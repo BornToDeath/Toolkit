@@ -9,7 +9,7 @@ cd $(dirname $0) || exit
 # ========== 一些开关 ==========
 
 # 单元测试开关
-UNIT_TEST="yes"
+UNIT_TEST="no"
 
 # 覆盖率开关
 COVERAGE="no"

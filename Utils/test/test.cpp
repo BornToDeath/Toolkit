@@ -4,6 +4,7 @@
 
 
 #include <iostream>
+#include <unistd.h>
 #include "Common/CommonUtil.h"
 #include "Device/DeviceUtil.h"
 #include "String/StringUtil.h"
@@ -30,15 +31,28 @@ namespace Test {
 
         // 测试：总内存大小
         auto memTotal = DeviceUtil::getMemoryTotal();
-        CommonUtil::print("总内存: %d KB", memTotal);
+        CommonUtil::print("总内存: %u B", memTotal);
 
         // 测试：空闲内存大小
         auto memFree = DeviceUtil::getMemoryFree();
-        CommonUtil::print("空闲内存: %d KB", memFree);
+        CommonUtil::print("空闲内存: %u B", memFree);
 
         // 测试：已用内存
         auto memUsage = DeviceUtil::getMemoryUsage();
-        CommonUtil::print("已用内存: %d KB", memUsage);
+        CommonUtil::print("已用内存: %u B", memUsage);
+
+        int pid = getpid();
+        auto curMemUsage = DeviceUtil::getMemoryUsageByPid(pid);
+        CommonUtil::print("当前进程(%d)占用内存: %u B", pid, curMemUsage);
+
+        auto procName = DeviceUtil::getNameByPid(pid);
+        CommonUtil::print("当前进程(%d)名: %s", pid, procName.c_str());
+
+        auto totalCoreCount = DeviceUtil::getLogicalCpuCoreCount();
+        CommonUtil::print("逻辑核数: %d", totalCoreCount);
+
+        auto onlineCoreCount = DeviceUtil::getOnlineCpuCoreCount();
+        CommonUtil::print("在线核数: %d", onlineCoreCount);
     }
 
     void testString() {
@@ -62,6 +76,7 @@ namespace Test {
 
 
 int main() {
-    Test::testString();
+    Test::DeviceUtilTest();
+//    Test::testString();
     return 0;
 }

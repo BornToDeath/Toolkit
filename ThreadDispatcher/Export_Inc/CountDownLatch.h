@@ -18,7 +18,7 @@ public:
     /**
      * @param count 等待的数量
      */
-    CountDownLatch(int count);
+    explicit CountDownLatch(int count);
 
     ~CountDownLatch() = default;
 

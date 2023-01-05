@@ -5,6 +5,7 @@
 #ifndef UTILS_DEVICEUTIL_H
 #define UTILS_DEVICEUTIL_H
 
+#include <string>
 
 /**
  * 设备工具类
@@ -75,6 +76,12 @@ public:
      * @return
      */
     static int getOnlineCpuCoreCount();
+
+    /**
+     * 获取 CPU Hardware
+     * @return
+     */
+    static std::string getCpuHardware();
 
 public:
 

@@ -265,3 +265,34 @@ int DeviceUtil::getOnlineCpuCoreCount() {
     coreCount = count;
     return coreCount;
 }
+
+std::string DeviceUtil::getCpuHardware() {
+    const std::string filePath = "/proc/cpuinfo";
+    std::ifstream ifs(filePath, std::ios::in);
+    if (!ifs.is_open()) {
+        return "";
+    }
+
+    std::string line;
+    while (getline(ifs, line)) {
+        // android -> "Hardware"; linux -> "model name"
+        if (line.find("Hardware") == std::string::npos &&
+            line.find("model name") == std::string::npos) {
+            continue;
+        }
+        auto index = line.find(':');
+        if (index == std::string::npos) {
+            continue;
+        }
+        line = line.substr(index + 1);
+        if (line.empty()) {
+            continue;
+        }
+        // 去除首尾空格
+        line.erase(0, line.find_first_not_of(' '));
+        line.erase(line.find_last_not_of(' ') + 1);
+        break;
+    }
+    ifs.close();
+    return line;
+}

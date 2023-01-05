@@ -53,6 +53,9 @@ namespace Test {
 
         auto onlineCoreCount = DeviceUtil::getOnlineCpuCoreCount();
         CommonUtil::print("在线核数: %d", onlineCoreCount);
+
+        auto cpuHardware = DeviceUtil::getCpuHardware();
+        CommonUtil::print("CPU Hardware: %s", cpuHardware.c_str());
     }
 
     void testString() {

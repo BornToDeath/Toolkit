@@ -13,7 +13,7 @@ CMake 使用 Protobuf 有三种方式：
 
 其中，前两种方法都需要本机已经安装 Protobuf ，并且网上也有现成的示例（如 [这里](https://blog.csdn.net/qq_37868450/article/details/113727764) ）。
 
-本文使用第三种方式，即直接使用源码编译出来的 Protobuf 库文件。考虑到一些设备本身可能并没有 Protobuf 环境（特别是一些性能较差的智能硬件），那就需要使用源码的方式来使用 Protobuf ，并且这种方式与环境无关，灵活性较高。但是缺点是每次 proto 文件更新时都需要手动生成对应的 `.pb.h/cc` 文件。
+本文使用第三种方式，即直接使用源码编译出来的 Protobuf 库文件。考虑到一些设备本身可能并没有 Protobuf 环境（特别是一些性能较差的智能硬件），那就需要使用源码编译出 Protobuf 的库文件和头文件的方式来使用 Protobuf ，并且这种方式与环境无关，灵活性较高。但是缺点是每次 proto 文件更新时都需要手动生成对应的 `.pb.h/cc` 文件。
 
 
 ## 环境要求
@@ -52,7 +52,10 @@ PbHelper::toJson(person, s);
 PbHelper::toBinary(person, s);
 
 // 二进制数据 转 pb
-PbHelper::parseFromBinary(s, p);
+PbHelper::parseFromBinary(s, person);
+
+// json 转 pb
+PbHelper::parseFromJson(s, person);
 ```
 
 
@@ -73,7 +76,7 @@ bool ParseFromArray(const void* data, int size);
 bool ParseFromString(const string& data);
 ```
 
-Protobuf 序列化和反序列化都是二进制数据，所以 `SerializeToString()/ParseFromString()` 方法输出/输入的也是二进制数据，不可以使用 `DebugString()` 或可见的文件字符串。
+Protobuf 序列化和反序列化都是二进制数据，所以 `SerializeToString() / ParseFromString()` 方法输出/输入的也是二进制数据，不可以使用 `DebugString()` 或可见的文件字符串。
 
 其他（反）序列化接口的功能都与此类似。
 

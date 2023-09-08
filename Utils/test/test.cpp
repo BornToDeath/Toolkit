@@ -8,6 +8,7 @@
 #include "Common/CommonUtil.h"
 #include "Device/DeviceUtil.h"
 #include "String/StringUtil.h"
+#include "File/FileUtil.h"
 
 
 namespace Test {
@@ -17,7 +18,7 @@ namespace Test {
         auto res = DeviceUtil::executeCommand(cmd.c_str());
         CommonUtil::print("%s: %s", cmd.c_str(), res.c_str());
 
-        cmd = "lixiaoqing";
+        cmd = "ls -l";
         res = DeviceUtil::executeCommand(cmd.c_str());
         CommonUtil::print("%s: %s", cmd.c_str(), res.c_str());
 
@@ -58,7 +59,7 @@ namespace Test {
         CommonUtil::print("CPU Hardware: %s", cpuHardware.c_str());
     }
 
-    void testString() {
+    void StringUtilTest() {
         std::string str1 = "    sdasdasd";
         StringUtil::trim(str1);
         std::cout << "str:[" << str1 << "]" << std::endl;
@@ -75,11 +76,26 @@ namespace Test {
         StringUtil::trim(str4);
         std::cout << "str:[" << str4 << "]" << std::endl;
     }
+
+    void FileUtilTest() {
+        char dir[512];
+        getcwd(dir, sizeof(dir));
+        const std::string filePath = std::string(dir) + "/Makefile";
+        if (!FileUtil::isFileExist(filePath.c_str())) {
+            CommonUtil::print("file not exist: %s", filePath.c_str());
+        } else {
+            auto md5 = FileUtil::getFileMD5(filePath.c_str());
+            CommonUtil::print("md5: %s", md5.c_str());
+        }
+    }
 }
 
 
 int main() {
     Test::DeviceUtilTest();
-//    Test::testString();
+    CommonUtil::print("%s", "-----------------------------------");
+    Test::StringUtilTest();
+    CommonUtil::print("%s", "-----------------------------------");
+    Test::FileUtilTest();
     return 0;
 }

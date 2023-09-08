@@ -15,9 +15,7 @@
 /**
  * 通用工具类
  */
-class CommonUtil final {
-
-public:
+namespace CommonUtil {
 
     /**
      * 解析 data 前四个字节所表示的整形值
@@ -25,7 +23,7 @@ public:
      * @param start 待解析数据的起始位置
      * @return
      */
-    static int bytes2Int(const BYTE *data, int start = 0);
+    int bytes2Int(const BYTE *data, int start = 0);
 
     /**
      * 获取对象类型
@@ -34,7 +32,7 @@ public:
      * @return
      */
     template<typename T>
-    static std::string getObjectType(T obj) {
+    std::string getObjectType(T obj) {
         return GET_NAME(T);
     }
 
@@ -45,7 +43,7 @@ public:
      * @return
      */
     template<typename T>
-    static T getEnumValueOfInt(int type) {
+    T getEnumValueOfInt(int type) {
         auto value = T(type);
         return value;
     }
@@ -57,7 +55,7 @@ public:
      * @return
      */
     template<typename T>
-    static int getIntValueOfEnum(T type) {
+    int getIntValueOfEnum(T type) {
         auto value = static_cast<typename std::underlying_type<T>::type>(type);
         return value;
     }
@@ -66,13 +64,7 @@ public:
      * 输出到标准输出
      * @param format
      */
-    static void print(const char *format, ...);
-
-public:
-
-    CommonUtil() = delete;
-
-    ~CommonUtil() = delete;
+    void print(const char *format, ...);
 
 };
 

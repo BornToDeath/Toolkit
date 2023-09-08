@@ -54,7 +54,7 @@ static unsigned char PADDING[64] = {
       }
 
 
-void MD5FileUtil::MD5Init(MD5_CTX *mdContext) {
+void MD5FileUtil::internal::MD5Init(MD5_CTX *mdContext) {
     mdContext->i[0] = mdContext->i[1] = (u4) 0;
 
     /* Load magic initialization constants.
@@ -65,7 +65,7 @@ void MD5FileUtil::MD5Init(MD5_CTX *mdContext) {
     mdContext->buf[3] = (u4) 0x10325476;
 }
 
-void MD5FileUtil::MD5Update(MD5_CTX *mdContext, unsigned char *inBuf, unsigned int inLen) {
+void MD5FileUtil::internal::MD5Update(MD5_CTX *mdContext, unsigned char *inBuf, unsigned int inLen) {
     u4 in[16];
     int mdi;
     unsigned int i, ii;
@@ -96,7 +96,7 @@ void MD5FileUtil::MD5Update(MD5_CTX *mdContext, unsigned char *inBuf, unsigned i
     }
 }
 
-void MD5FileUtil::MD5Final(MD5_CTX *mdContext) {
+void MD5FileUtil::internal::MD5Final(MD5_CTX *mdContext) {
     u4 in[16];
     int mdi;
     unsigned int i, ii;
@@ -135,7 +135,7 @@ void MD5FileUtil::MD5Final(MD5_CTX *mdContext) {
 
 /* Basic MD5 step. transform buf based on in.
 */
-void MD5FileUtil::transform(u4 *buf, u4 *in) {
+void MD5FileUtil::internal::transform(u4 *buf, u4 *in) {
     u4 a = buf[0], b = buf[1], c = buf[2], d = buf[3];
 
     /* Round 1 */
@@ -253,11 +253,11 @@ char *MD5FileUtil::getFileMD5(const char *path, int md5_len) {
         return NULL;
     }
 
-    MD5Init(&mdContext);
+    internal::MD5Init(&mdContext);
     while ((bytes = fread(data, 1, 1024, fp)) != 0) {
-        MD5Update(&mdContext, data, bytes);
+        internal::MD5Update(&mdContext, data, bytes);
     }
-    MD5Final(&mdContext);
+    internal::MD5Final(&mdContext);
 
     file_md5 = (char *) malloc((md5_len + 1) * sizeof(char));
     if (file_md5 == NULL) {

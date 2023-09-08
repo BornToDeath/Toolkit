@@ -18,32 +18,26 @@ typedef struct {
 /**
  * 文件 MD5 工具类
  */
-class MD5FileUtil final {
-
-public:
-
-    MD5FileUtil() = default;
-
-    ~MD5FileUtil() = default;
-
-public:
+namespace MD5FileUtil {
 
     /**
      * 获取文件 MD5 值
      * @param filePath
      * @param md5Length
      */
-    static char *getFileMD5(const char *filePath, int md5_len = 32);
+    char *getFileMD5(const char *filePath, int md5_len = 32);
 
-private:
+    // 仅限内部使用
+    namespace internal {
 
-    static void MD5Init(MD5_CTX *mdContext);
+        void MD5Init(MD5_CTX *mdContext);
 
-    static void MD5Update(MD5_CTX *mdContext, unsigned char *inBuf, unsigned int inLen);
+        void MD5Update(MD5_CTX *mdContext, unsigned char *inBuf, unsigned int inLen);
 
-    static void MD5Final(MD5_CTX *mdContext);
+        void MD5Final(MD5_CTX *mdContext);
 
-    static void transform(unsigned int *buf, unsigned int *in);
+        void transform(unsigned int *buf, unsigned int *in);
+    }
 
 };
 

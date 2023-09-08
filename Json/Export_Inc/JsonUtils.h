@@ -10,14 +10,12 @@
 /**
  * 封装的 Json 工具类
  */
-class JsonUtils {
-
-public:
+namespace JsonUtils {
 
     /**
      * 将一个 Json 字符串转为 Json::Value.
      */
-    static bool string2JsonValue(Json::Value &outValue, const std::string &json) {
+    bool string2JsonValue(Json::Value &outValue, const std::string &json) {
         Json::Reader reader;
         return reader.parse(json, outValue, false);
     }
@@ -25,7 +23,7 @@ public:
     /**
      * 判断 obj 中是否包含指定 name 的元素。
      */
-    static inline bool has(const Json::Value &obj, const std::string &name) {
+    inline bool has(const Json::Value &obj, const std::string &name) {
         return obj.isMember(name);
     }
 
@@ -34,7 +32,7 @@ public:
      * 如果不存在，返回 defValue 。
      * 如果 name 对应的字段不是一个 int 类型，且无法自动转换，返回 defValue 。
      */
-    static int getInt(const Json::Value &obj, const std::string &name, int defValue) {
+    int getInt(const Json::Value &obj, const std::string &name, int defValue) {
         if (!has(obj, name)) {
             return defValue;
         }
@@ -52,7 +50,7 @@ public:
      * 如果不存在，返回 defValue 。
      * 如果 name 对应的字段不是一个 bool 类型，且无法自动转换，返回 defValue 。
      */
-    static bool getBool(const Json::Value &obj, const std::string &name, bool defValue) {
+    bool getBool(const Json::Value &obj, const std::string &name, bool defValue) {
         if (!has(obj, name)) {
             return defValue;
         }
@@ -91,7 +89,7 @@ public:
      * 如果不存在，返回 defValue 。
      * 如果 name 对应的字段不是一个 double 类型，且无法自动转换，返回 defValue 。
      */
-    static double getDouble(const Json::Value &obj, const std::string &name, double defValue) {
+    double getDouble(const Json::Value &obj, const std::string &name, double defValue) {
         if (!has(obj, name)) {
             return defValue;
         }
@@ -109,7 +107,7 @@ public:
      * 如果不存在，返回 defValue 。
      * 如果 name 对应的字段不是一个 string 类型，且无法自动转换，返回 defValue 。
      */
-    static std::string getString(const Json::Value &obj, const std::string &name, std::string defValue) {
+    std::string getString(const Json::Value &obj, const std::string &name, std::string defValue) {
         if (!has(obj, name)) {
             return defValue;
         }
@@ -145,7 +143,7 @@ public:
      * 如果不存在，返回 defValue 。
      * 如果 name 对应的字段不是一个 unsigned int 类型，且无法自动转换，返回 defValue 。
      */
-    static unsigned int getUnsignedInt(const Json::Value &obj, const std::string &name, unsigned int defValue) {
+    unsigned int getUnsignedInt(const Json::Value &obj, const std::string &name, unsigned int defValue) {
         if (!has(obj, name)) {
             return defValue;
         }
@@ -158,8 +156,7 @@ public:
         return defValue;
     }
 
-    static unsigned long long
-    getULongLong(const Json::Value &obj, const std::string &name, unsigned long long defValue) {
+    unsigned long long getULongLong(const Json::Value &obj, const std::string &name, unsigned long long defValue) {
         if (!has(obj, name)) {
             return defValue;
         }
@@ -172,7 +169,7 @@ public:
         return defValue;
     }
 
-    static long long getLongLong(const Json::Value &obj, const std::string &name, long long defValue) {
+    long long getLongLong(const Json::Value &obj, const std::string &name, long long defValue) {
         if (!has(obj, name)) {
             return defValue;
         }
@@ -191,7 +188,7 @@ public:
      * @param name
      * @return
      */
-    static Json::Value getJsonValue(const Json::Value &obj, const std::string &name) {
+    Json::Value getJsonValue(const Json::Value &obj, const std::string &name) {
         Json::Value defValue = Json::nullValue;
         if (!has(obj, name)) {
             return defValue;
@@ -207,7 +204,7 @@ public:
      * @param obj
      * @return
      */
-    static bool readJsonFile(const std::string &filePath, Json::Value &obj) {
+    bool readJsonFile(const std::string &filePath, Json::Value &obj) {
         std::ifstream ifs(filePath);
         if (!ifs.is_open()) {
             return false;
@@ -226,7 +223,7 @@ public:
      * @param obj
      * @return
      */
-    static std::string jsonValue2String(const Json::Value &obj) {
+    std::string jsonValue2String(const Json::Value &obj) {
         return Json::FastWriter().write(obj);
     }
 

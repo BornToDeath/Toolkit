@@ -57,6 +57,12 @@ namespace Test {
 
         auto cpuHardware = DeviceUtil::getCpuHardware();
         CommonUtil::print("CPU Hardware: %s", cpuHardware.c_str());
+
+        auto totalCpuUsage = DeviceUtil::getTotalCpuUsage();
+        CommonUtil::print("Total CPU Usage: %f", totalCpuUsage);
+
+        auto curCpuUsage = DeviceUtil::getCurProcCpuUsage();
+        CommonUtil::print("Current Process CPU Usage: %f", curCpuUsage);
     }
 
     void StringUtilTest() {

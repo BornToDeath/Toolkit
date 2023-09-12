@@ -4,13 +4,18 @@
 
 #include <iostream>
 #include <fstream>
+#include <vector>
+#include <numeric>
 #include <cstring>
+#include <unistd.h>
 #include "Device/DeviceUtil.h"
 
 #define TAG "DeviceUtil"
+#define CPU_SLEEP_DURATION (3)
 
 
 float DeviceUtil::getCPUTemperature() {
+    // thermal/thermal_zoneX/type 为 "cpu" 的才是 cpu 的温度
     const std::string filePath = "/sys/class/thermal/thermal_zone0/temp";
     std::ifstream input(filePath, std::ios::in);
     if (!input.is_open()) {
@@ -295,4 +300,75 @@ std::string DeviceUtil::getCpuHardware() {
     }
     ifs.close();
     return line;
+}
+
+float DeviceUtil::getTotalCpuUsage() {
+    auto beginCpuTime = internal::getTotalCpuTime();
+    sleep(CPU_SLEEP_DURATION);
+    auto endCpuTime = internal::getTotalCpuTime();
+    auto idleUsage = (endCpuTime.second - beginCpuTime.second) * 1.0f / (endCpuTime.first - beginCpuTime.first);
+    return 1 - idleUsage;
+}
+
+float DeviceUtil::getCurProcCpuUsage() {
+    auto beginTotalCpuTime = internal::getTotalCpuTime();
+    auto beginProcCpuTime = internal::getCurProcCpuTime();
+    sleep(CPU_SLEEP_DURATION);
+    auto endProcCpuTime = internal::getCurProcCpuTime();
+    auto endTotalCpuTime = internal::getTotalCpuTime();
+    auto usage = (endProcCpuTime - beginProcCpuTime) * 1.0f / (endTotalCpuTime.first - beginTotalCpuTime.first);
+    return usage * getLogicalCpuCoreCount();
+}
+
+std::pair<long, long> DeviceUtil::internal::getTotalCpuTime() {
+    FILE *fd = fopen("/proc/stat", "r");
+    if (fd == nullptr) {
+        return {};
+    }
+
+    char buff[1024] = {0};
+    fgets(buff, sizeof(buff), fd);
+    fclose(fd);
+
+    char name[16];
+    std::vector<long> params(10, 0);
+    sscanf(buff, "%s %ld %ld %ld %ld %ld %ld %ld %ld %ld %ld",
+           name,
+           &params[0], &params[1], &params[2], &params[3], &params[4],
+           &params[5], &params[6], &params[7], &params[8], &params[9]);
+
+//    user = params[0];
+//    nice = params[1];
+//    system = params[2];
+    auto idle = params[3];
+    auto total = std::accumulate(params.begin(), params.end(), 0L);
+    return {total, idle};
+}
+
+long DeviceUtil::internal::getCurProcCpuTime() {
+    char filePath[64]{};
+    sprintf(filePath, "/proc/%d/stat", getpid());
+    std::string cpuModel;
+    std::ifstream ifs(filePath, std::ios::in);
+    if (!ifs.is_open()) {
+        return 0;
+    }
+
+    std::string line;
+    getline(ifs, line);
+    ifs.close();
+    if (line.empty()) {
+        return 0;
+    }
+    int pos = -1;
+    for (int i = 0; i < 13; ++i) {
+        if ((pos = line.find(' ', pos + 1)) == std::string::npos) {
+            return 0;
+        }
+    }
+
+    auto info = line.substr(pos + 1);
+    int utime = 0, stime = 0, cutime = 0, cstime = 0;
+    sscanf(info.c_str(), "%d %d %d %d", &utime, &stime, &cutime, &cstime);
+    return utime + stime + cutime + cstime;
 }

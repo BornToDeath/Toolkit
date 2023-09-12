@@ -81,6 +81,33 @@ namespace DeviceUtil {
      */
     std::string getCpuHardware();
 
+    /**
+     * 获取整体 CPU 占用率
+     * @return
+     */
+    float getTotalCpuUsage();
+
+    /**
+     * 获取当前进程 CPU 占用率
+     * @return
+     */
+    float getCurProcCpuUsage();
+
+    // 仅限内部使用
+    namespace internal {
+
+        /**
+         * 获取整体 CPU 占用时间
+         * @return <total, idle>
+         */
+        std::pair<long, long> getTotalCpuTime();
+
+        /**
+         * 获取当前进程 CPU 占用时间
+         * @return
+         */
+        long getCurProcCpuTime();
+    }
 };
 
 #endif //UTILS_DEVICEUTIL_H

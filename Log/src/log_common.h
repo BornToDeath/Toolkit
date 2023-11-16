@@ -2,8 +2,8 @@
 // Created by lixiaoqing on 2021/8/8.
 //
 
-#ifndef LOG_LOGCOMMON_H
-#define LOG_LOGCOMMON_H
+#ifndef LOG_LOG_COMMON_H
+#define LOG_LOG_COMMON_H
 
 
 /* ======================================================= */
@@ -165,4 +165,4 @@ enum class LogFileStatus : int {
 #endif
 
 
-#endif //LOG_LOGCOMMON_H
+#endif //LOG_LOG_COMMON_H

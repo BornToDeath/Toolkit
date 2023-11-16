@@ -2,8 +2,8 @@
 // Created by lixiaoqing on 2021/5/19.
 //
 
-#ifndef LOG_LOGENCRYPTOR_H
-#define LOG_LOGENCRYPTOR_H
+#ifndef LOG_LOG_ENCRYPTOR_H
+#define LOG_LOG_ENCRYPTOR_H
 
 
 /**
@@ -38,4 +38,4 @@ private:
 
 }  // namespace log
 
-#endif //LOG_LOGENCRYPTOR_H
+#endif //LOG_LOG_ENCRYPTOR_H

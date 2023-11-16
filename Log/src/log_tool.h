@@ -2,8 +2,8 @@
 // Created by lixiaoqing on 2021/5/19.
 //
 
-#ifndef LOG_LOGTOOLS_H
-#define LOG_LOGTOOLS_H
+#ifndef LOG_LOG_TOOL_H
+#define LOG_LOG_TOOL_H
 
 
 /**
@@ -17,8 +17,8 @@
 /**
  * 自定义头文件
  */
-#include "LogCommon.h"
-#include "Log.h"
+#include "log_common.h"
+#include "log.h"
 
 namespace log {
 namespace tool {
@@ -91,4 +91,4 @@ std::string GetCurrentDateTime(const char *format);
 }  // namespace log
 
 
-#endif //LOG_LOGTOOLS_H
+#endif //LOG_LOG_TOOL_H

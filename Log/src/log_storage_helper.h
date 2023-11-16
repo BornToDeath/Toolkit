@@ -2,8 +2,8 @@
 // Created by lixiaoqing on 2021/5/19.
 //
 
-#ifndef LOG_LOGSTORAGEHELPER_H
-#define LOG_LOGSTORAGEHELPER_H
+#ifndef LOG_LOG_STORAGE_HELPER_H
+#define LOG_LOG_STORAGE_HELPER_H
 
 
 /**
@@ -16,7 +16,7 @@
 /**
  * 自定义头文件
  */
-#include "LogCommon.h"
+#include "log_common.h"
 
 namespace log {
 
@@ -143,4 +143,4 @@ private: /* Fields                                         */
 
 }  // namespace log
 
-#endif //LOG_LOGSTORAGEHELPER_H
+#endif //LOG_LOG_STORAGE_HELPER_H

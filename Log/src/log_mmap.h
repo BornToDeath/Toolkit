@@ -2,8 +2,8 @@
 // Created by lixiaoqing on 2021/5/19.
 //
 
-#ifndef LOG_LOGMMAP_H
-#define LOG_LOGMMAP_H
+#ifndef LOG_LOG_MMAP_H
+#define LOG_LOG_MMAP_H
 
 
 /**
@@ -14,8 +14,8 @@
 /**
  * 自定义头文件
  */
-#include "IMmap.h"
-#include "LogStorageHelper.h"
+#include "immap.h"
+#include "log_storage_helper.h"
 
 namespace log {
 
@@ -169,4 +169,4 @@ private: /* Fields                                         */
 
 }  // namespace log
 
-#endif //LOG_LOGMMAP_H
+#endif //LOG_LOG_MMAP_H

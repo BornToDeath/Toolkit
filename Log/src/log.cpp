@@ -14,9 +14,9 @@
 /**
  * 自定义头文件
  */
-#include "Log.h"
-#include "Logger.h"
-#include "LogTools.h"
+#include "log.h"
+#include "logger.h"
+#include "log_tool.h"
 
 /**
  * 宏定义
@@ -112,8 +112,6 @@ void Log::Error(const char *tag, const char *format, ...) {
     vsnprintf(logText, LOG_TEXT_MAX_LEN, format, arg_list);
     va_end(arg_list);
 
-    // Normal 文件中也记录一份, 方便阅读日志
-    Log::Save(LogType::Normal, LogLevel::Error, tag, logText);
     Log::Save(LogType::Error, LogLevel::Error, tag, logText);
 }
 
@@ -129,5 +127,9 @@ bool Log::Save(LogType type, LogLevel level, const char *tag, const char *log) {
 
     // 存储日志
     Logger::Singleton().WriteLog(type, level, tag, log);
+    if (type == LogType::Error) {
+        // Normal 文件中也记录一份 Error 日志, 方便阅读
+        Logger::Singleton().WriteLog(LogType::Normal, level, tag, log);
+    }
     return true;
 }

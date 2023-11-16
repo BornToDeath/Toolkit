@@ -18,9 +18,9 @@
 /**
  * 自定义库
  */
-#include "LogMmap.h"
-#include "LogCommon.h"
-#include "LogTools.h"
+#include "log_mmap.h"
+#include "log_common.h"
+#include "log_tool.h"
 
 
 /**

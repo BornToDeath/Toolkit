@@ -2,12 +2,12 @@
 // Created by lixiaoqing on 2021/5/19.
 //
 
-#ifndef LOG_LOGMODEL_H
-#define LOG_LOGMODEL_H
+#ifndef LOG_LOG_MODEL_H
+#define LOG_LOG_MODEL_H
 
 
 // 自定义头文件
-#include "LogMmap.h"
+#include "log_mmap.h"
 
 namespace log {
 
@@ -54,4 +54,4 @@ private:
 
 }  // namespace log
 
-#endif //LOG_LOGMODEL_H
+#endif //LOG_LOG_MODEL_H

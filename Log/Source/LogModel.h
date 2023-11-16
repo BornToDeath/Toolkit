@@ -9,6 +9,7 @@
 // 自定义头文件
 #include "LogMmap.h"
 
+namespace log {
 
 /**
  * 日志模型类，每个 model 对应一种日志类型。此类不可被继承
@@ -20,13 +21,6 @@ public:
     explicit LogModel(const std::string &logFileDir);
 
     ~LogModel() = default;
-
-    /**
-     * 将单条日志写入文件
-     * @param logData
-     * @return
-     */
-    bool writeLogToFile(const std::shared_ptr<LogData> &logData);
 
     /**
      * 禁用拷贝构造函数
@@ -41,13 +35,23 @@ public:
      */
     LogModel &operator=(const LogModel &model) = delete;
 
+public:
+
+    /**
+     * 将单条日志写入文件
+     * @param logData
+     * @return
+     */
+    bool WriteLogToFile(const std::shared_ptr<LogData> &logData);
+
 private:
 
     /**
-     * mmap 实现对象。进行 mmap 映射等操作
+     * Mmap 实现对象。进行 Mmap 映射等操作
      */
-    std::shared_ptr<LogMmap> mmapImpl;
+    std::shared_ptr<LogMmap> mmapImpl_;
 };
 
+}  // namespace log
 
 #endif //LOG_LOGMODEL_H

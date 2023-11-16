@@ -18,6 +18,7 @@
  */
 #include "LogCommon.h"
 
+namespace log {
 
 /**
  * 日志存储器。
@@ -33,50 +34,12 @@ public: /* Methods                                         */
      *
      * @param logFileDir 日志目录
      */
-    explicit LogStorageHelper(std::string  logFileDir);
+    explicit LogStorageHelper(std::string logFileDir);
 
     /**
      * 析构函数
      */
     ~LogStorageHelper() = default;
-
-    /**
-     * 准备日志文件，为 mmap 映射做准备
-     * @param filePath  日志文件名。绝对路径
-     * @param logOffset 如果文件可用，则标识日志待写入的文件位置
-     * @return
-     */
-    LogFileStatus prepareLogFile(const char *filePath, long &logOffset);
-
-    /**
-     * 重命名日志文件
-     * @return
-     */
-    bool renameLogFile();
-
-    /**
-     * 删除历史日志数据。
-     * @return 删除成功的历史日志文件的个数
-     */
-    int deleteOldestLogFile();
-
-    /**
-     * logFileMaxIndex get 方法
-     * @return
-     */
-    long getLogFileMaxIndex() const;
-
-    /**
-     * logFileMinIndex get 方法
-     * @return
-     */
-    long getLogFileMinIndex() const;
-
-    /**
-     * logFileNums get 方法
-     * @return
-     */
-    long getLogFileNums() const;
 
     /**
      * 禁用拷贝构造
@@ -91,6 +54,46 @@ public: /* Methods                                         */
      */
     LogStorageHelper &operator=(const LogStorageHelper &logStorageHelper) = delete;
 
+public:
+
+    /**
+     * 准备日志文件，为 Mmap 映射做准备
+     * @param filePath  日志文件名。绝对路径
+     * @param logOffset 如果文件可用，则标识日志待写入的文件位置
+     * @return
+     */
+    LogFileStatus PrepareLogFile(const char *filePath, long &logOffset);
+
+    /**
+     * 重命名日志文件
+     * @return
+     */
+    bool RenameLogFile();
+
+    /**
+     * 删除历史日志数据。
+     * @return 删除成功的历史日志文件的个数
+     */
+    int DeleteOldestLogFile();
+
+    /**
+     * logFileMaxIndex_ get 方法
+     * @return
+     */
+    long GetLogFileMaxIndex() const;
+
+    /**
+     * logFileMinIndex_ get 方法
+     * @return
+     */
+    long GetLogFileMinIndex() const;
+
+    /**
+     * logFileNums_ get 方法
+     * @return
+     */
+    long GetLogFileNums() const;
+
 /* ======================================================= */
 private: /* Methods                                        */
 /* ======================================================= */
@@ -102,14 +105,14 @@ private: /* Methods                                        */
      *   3. 历史日志文件的个数
      * @return
      */
-    bool updateLogFileParams();
+    bool UpdateLogFileParams();
 
     /**
      * 获取文件第一个 \0 出现的位置，作为将来日志的存储开始位置
      * @param file 文件指针
      * @return
      */
-    long getLocationToBeWritten(FILE *file) const;
+    long GetLocationToBeWritten(FILE *file) const;
 
 
 /* ======================================================= */
@@ -119,23 +122,25 @@ private: /* Fields                                         */
     /**
      * 日志目录
      */
-    const std::string logFileDir;
+    const std::string logFileDir_;
 
     /**
      * 历史日志文件名最大索引
      */
-    long logFileMaxIndex;
+    long logFileMaxIndex_;
 
     /**
      * 历史日志文件名最小索引
      */
-    long logFileMinIndex;
+    long logFileMinIndex_;
 
     /**
      * 当前历史日志文件的个数
      */
-    long logFileNums;
+    long logFileNums_;
 
 };
+
+}  // namespace log
 
 #endif //LOG_LOGSTORAGEHELPER_H

@@ -12,8 +12,9 @@
 #include "LogCommon.h"
 #include "LogTools.h"
 
+namespace log {
 
-void LogEncryptor::encryptLog(const std::string &inputLog, std::string &outputLog) {
+void LogEncryptor::EncryptLog(const std::string &inputLog, std::string &outputLog) {
 
     if (DEBUG) {
         outputLog = inputLog;
@@ -23,7 +24,7 @@ void LogEncryptor::encryptLog(const std::string &inputLog, std::string &outputLo
     const std::string key = LOG_ENCRYPT_KEY;
     size_t keyLen = key.length();
 
-    char *base64Input = base64Encode(inputLog.c_str(), inputLog.length());
+    char *base64Input = Base64Encode(inputLog.c_str(), inputLog.length());
     int base64Len = static_cast<int>(strlen(base64Input));
 
     for (int i = 0; i < base64Len; i++) {
@@ -37,8 +38,8 @@ void LogEncryptor::encryptLog(const std::string &inputLog, std::string &outputLo
 //        base64Input[i] = c;
     }
 
-    // 注意：base64Len 的长度必须传进去，否则编码有问题！问题是：在 base64Encode() 内部通过 strlen() 函数获取到的 base64Input 长度和此时获取到的长度不同
-    char *result = base64Encode(base64Input, base64Len);
+    // 注意：base64Len 的长度必须传进去，否则编码有问题！问题是：在 Base64Encode() 内部通过 strlen() 函数获取到的 base64Input 长度和此时获取到的长度不同
+    char *result = Base64Encode(base64Input, base64Len);
 
     outputLog = result;
 
@@ -46,7 +47,7 @@ void LogEncryptor::encryptLog(const std::string &inputLog, std::string &outputLo
     free(result);
 }
 
-char *LogEncryptor::base64Encode(const char *const data, const size_t data_len) {
+char *LogEncryptor::Base64Encode(const char *data, size_t data_len) {
 
     const char base[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
     size_t ret_len = data_len / 3;
@@ -98,3 +99,5 @@ char *LogEncryptor::base64Encode(const char *const data, const size_t data_len) 
 
     return ret;
 }
+
+}  // namespace log

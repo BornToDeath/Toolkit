@@ -10,6 +10,7 @@ if (NOT INCLUDE_LOG)
     #    add_compile_options(-fPIC)
 
     if (CMAKE_BUILD_TYPE MATCHES "DEBUG")
+        message(STATUS "add macro BUILD_TYPE_DEBUG")
         ADD_DEFINITIONS(-DBUILD_TYPE_DEBUG)
     endif ()
 
@@ -21,12 +22,13 @@ if (NOT INCLUDE_LOG)
     )
 
     # -------------------- 测试 --------------------
-    function(testLog)
+    option(RunLog "set ON to build test binary" OFF)
+    if (RunLog)
+        message(STATUS "build test binary: runLog")
         add_compile_options(-g)
         # 编译成可执行程序
         add_executable(runLog test/test.cpp)
         target_link_libraries(runLog Log_static)
-    endfunction()
-    #    testLog()
+    endif ()
 
 endif ()

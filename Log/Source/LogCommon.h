@@ -15,12 +15,12 @@
 
 
 /**
- * 是否是 debug 环境
+ * 是否是 Debug 环境
  */
 #ifdef BUILD_TYPE_DEBUG
 #define DEBUG 1
 #else
-#define DEBUG 0
+#define DEBUG 1
 #endif
 
 /**
@@ -65,8 +65,8 @@ const char *const logLevelName[4] = {
  */
 enum class LogStrategy : int {
     LOG_MEMORY_FAIL = -2, /* 标识内存缓存启用失败 */
-    LOG_MMAP_FAIL = -1, /* 标识 mmap 缓存启用失败 */
-    LOG_MMAP = 1,  /* 标识 mmap 缓存启用成功 */
+    LOG_MMAP_FAIL = -1, /* 标识 Mmap 缓存启用失败 */
+    LOG_MMAP = 1,  /* 标识 Mmap 缓存启用成功 */
     LOG_MEMORY = 2   /* 标识内存缓存启用成功 */
 };
 
@@ -161,13 +161,8 @@ enum class LogFileStatus : int {
  * 日志加密的 KEY
  */
 #ifndef LOG_ENCRYPT_KEY
-#define LOG_ENCRYPT_KEY "AUTONAVI_AIDOT_!@#$%^&*()_2021"
+#define LOG_ENCRYPT_KEY "BornToDeath"
 #endif
-
-/**
- * 类型定义
- */
-using BYTE = unsigned char;
 
 
 #endif //LOG_LOGCOMMON_H

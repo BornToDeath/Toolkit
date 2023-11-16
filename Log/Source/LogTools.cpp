@@ -5,12 +5,13 @@
 
 /******** 系统头文件 *********/
 #include <iostream>
+#include <sys/prctl.h>
 #include <sys/stat.h>
 #include <chrono>
 #include <cstdarg>
 #include <cstring>
-#include <sstream>
 #include <iomanip>
+#include <sstream>
 
 /******** 自定义头文件 *********/
 #include "LogTools.h"
@@ -20,14 +21,21 @@
 #define LOG_COLOR_RED "\033[31m"
 #define LOG_COLOR_PURPLE "\033[35m"
 
-unsigned long long LogTools::currentTimeMills() {
+namespace log {
+namespace tool {
+
+unsigned long long CurrentTimeMills() {
     std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::system_clock::now().time_since_epoch()
     );
     return ms.count();
 }
 
-void LogTools::printLog(LogLevel level, const char *tag, const char *threadName, const char *format, ...) {
+void PrintLog(LogLevel level, const char *tag, const char *format, ...) {
+
+    // 获取线程名
+    char threadName[THREAD_NAME_MAX_LEN] = {0};
+    prctl(PR_GET_NAME, threadName);
 
     // 日志内容
     char logText[LOG_TEXT_MAX_LEN] = {0};
@@ -41,7 +49,7 @@ void LogTools::printLog(LogLevel level, const char *tag, const char *threadName,
     const char *logLevel = logLevelName[static_cast<int>(level)];
 
     // 当前时间
-    std::string now = LogTools::getCurrentDateTime("%Y-%m-%d %H:%M:%S");
+    std::string now = GetCurrentDateTime("%Y-%m-%d %H:%M:%S");
 
     std::ostringstream oss;
     oss << now
@@ -66,7 +74,7 @@ void LogTools::printLog(LogLevel level, const char *tag, const char *threadName,
     printf("%s\n", log.c_str());
 }
 
-std::string LogTools::getLogStrategyName(LogStrategy strategy) {
+std::string getLogStrategyName(LogStrategy strategy) {
     switch (strategy) {
         case LogStrategy::LOG_MMAP:
             return "LOG_MMAP";
@@ -81,7 +89,7 @@ std::string LogTools::getLogStrategyName(LogStrategy strategy) {
     }
 }
 
-std::string LogTools::getLogTypeName(LogType type) {
+std::string GetLogTypeName(LogType type) {
     switch (type) {
         case LogType::Normal:
             return "normal";
@@ -92,11 +100,11 @@ std::string LogTools::getLogTypeName(LogType type) {
     }
 }
 
-bool LogTools::isFileExist(const char *const &filePath) {
+bool IsFileExist(const char *const &filePath) {
     return 0 == access(filePath, F_OK);
 }
 
-long LogTools::getFileSize(const char *const &filePath) {
+long GetFileSize(const char *const &filePath) {
 
     FILE *fp = fopen(filePath, "rb");
     if (fp == nullptr) {
@@ -110,7 +118,7 @@ long LogTools::getFileSize(const char *const &filePath) {
     return fileSize;
 }
 
-bool LogTools::createDirIfNotExist(const char *const &dir) {
+bool CreateDirIfNotExist(const char *const &dir) {
     if (dir == nullptr) {
         return false;
     }
@@ -124,7 +132,7 @@ bool LogTools::createDirIfNotExist(const char *const &dir) {
     return true;
 }
 
-bool LogTools::createMultiLevelDir(const char *dir) {
+bool CreateMultiLevelDir(const char *dir) {
     if (dir == nullptr) {
         return false;
     }
@@ -135,7 +143,7 @@ bool LogTools::createMultiLevelDir(const char *dir) {
     }
 
     // 先尝试创建
-    if (createDirIfNotExist(dir)) {
+    if (CreateDirIfNotExist(dir)) {
         return true;
     }
 
@@ -149,14 +157,14 @@ bool LogTools::createMultiLevelDir(const char *dir) {
             break;
         }
         std::string temp = root.substr(0, index);
-        isOk = createDirIfNotExist(temp.c_str());
+        isOk = CreateDirIfNotExist(temp.c_str());
         offset = index + 1;
     } while (isOk);
 
     return isOk;
 }
 
-std::string LogTools::getCurrentDateTime(const char *const format) {
+std::string GetCurrentDateTime(const char *const format) {
 
     {
         /**
@@ -184,7 +192,6 @@ std::string LogTools::getCurrentDateTime(const char *const format) {
 
 
     {
-
         /**
          * 方式二：精确到毫秒
          * 示例：2021-08-04 21:51:53.443
@@ -210,3 +217,6 @@ std::string LogTools::getCurrentDateTime(const char *const format) {
         return oss.str();
     }
 }
+
+}  // namespace tool
+}  // namespace log

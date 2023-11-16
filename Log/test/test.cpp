@@ -10,18 +10,23 @@
 
 int main() {
 
-    Log::init("/home/lixiaoqing/test/logs/");
+    Log::Init("/home/tmp/logs/");
 
-    const int count = 100;
-    for (int i = 1; i <= count; ++i) {
-        Log::debug(TAG, "%d | %s", i, "「斯人若彩虹，遇上方知有。」");
-        Log::info(TAG, "%d | %s", i, "「斯人若彩虹，遇上方知有。」");
-        Log::warn(TAG, "%d | %s", i, "「斯人若彩虹，遇上方知有。」");
-        Log::error(TAG, "%d | %s", i, "「斯人若彩虹，遇上方知有。」");
-    }
+    auto runnable = []() {
+        const int count = 10000;
+        for (int i = 1; i <= count; ++i) {
+            Log::Debug(TAG, "%d | %s", i, "「斯人若彩虹，遇上方知有。」");
+            Log::Info(TAG, "%d | %s", i, "「斯人若彩虹，遇上方知有。」");
+            Log::Warn(TAG, "%d | %s", i, "「斯人若彩虹，遇上方知有。」");
+            Log::Error(TAG, "%d | %s", i, "「斯人若彩虹，遇上方知有。」");
+        }
+    };
+    std::thread(runnable).detach();
 
-    Log::info(TAG, "进程退出");
-    Log::release();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    Log::Info(TAG, "进程退出");
+    Log::Stop();
 
+    std::this_thread::sleep_for(std::chrono::hours(1));
     return 0;
 }

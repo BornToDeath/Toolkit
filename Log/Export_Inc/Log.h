@@ -18,8 +18,8 @@
  * 日志类型。不同类型日志需要写入到不同文件中
  */
 enum class LogType {
-    Normal = 0,  /* 常规日志，包括 debug、info、warn 级别日志 */
-    Error,       /* 错误日志，即 error 级别日志 */
+    Normal = 0,  /* 常规日志，包括 Debug、Info、Warn 级别日志 */
+    Error,       /* 错误日志，即 Error 级别日志 */
 };
 
 /**
@@ -46,28 +46,28 @@ public:
      * 注意：必须在调用日志打印接口之前被调用！
      * @param logDir 日志文件的根目录
      */
-    static bool init(const char *rootDir);
+    static bool Init(const char *rootDir);
 
     /**
      * 释放资源，退出时调用。
      * 注意：调用此方法后就不能再调用 Log 的相关方法存储日志！
      * @return
      */
-    static void release();
+    static void Stop();
 
     /**
-     * debug 日志信息
+     * Debug 日志信息
      * @param tag    标签
      * @param format 格式化字符串
      * @param ...    可变参数
      */
-    static void debug(const char *tag, const char *format, ...);
+    static void Debug(const char *tag, const char *format, ...);
 
-    static void info(const char *tag, const char *format, ...);
+    static void Info(const char *tag, const char *format, ...);
 
-    static void warn(const char *tag, const char *format, ...);
+    static void Warn(const char *tag, const char *format, ...);
 
-    static void error(const char *tag, const char *format, ...);
+    static void Error(const char *tag, const char *format, ...);
 
 public:
 
@@ -103,7 +103,7 @@ private:
      * @param tag
      * @param log
      */
-    static bool save(LogType type, LogLevel level, const char *tag, const char *log);
+    static bool Save(LogType type, LogLevel level, const char *tag, const char *log);
 };
 
 

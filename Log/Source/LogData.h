@@ -16,6 +16,7 @@
 #include "LogCommon.h"
 #include "Log.h"
 
+namespace log {
 
 /**
  * 日志数据结构类。
@@ -38,16 +39,6 @@ public: /* Methods                                         */
 
     ~LogData() = default;
 
-    LogLevel getLevel() const;
-
-    LogType getType() const;
-
-    std::string getTag() const;
-
-    std::string getLog() const;
-
-    void setLog(const std::string &log);
-
     /**
      * 禁用拷贝构造
      * @param logData
@@ -61,6 +52,18 @@ public: /* Methods                                         */
      */
     LogData &operator=(const LogData &logData) = delete;
 
+public:
+
+    LogLevel GetLevel() const;
+
+    LogType GetType() const;
+
+    std::string GetTag() const;
+
+    std::string GetLog() const;
+
+    void SetLog(const std::string &log);
+
 /* ======================================================= */
 private: /* Fields                                         */
 /* ======================================================= */
@@ -68,24 +71,25 @@ private: /* Fields                                         */
     /**
      * 日志类型
      */
-    LogType type;
+    LogType type_;
 
     /**
      * 日志级别
      */
-    LogLevel level;
+    LogLevel level_;
 
     /**
      * 日志标签，可以是当前日志所在类名
      */
-    std::string tag;
+    std::string tag_;
 
     /**
      * 日志内容
      */
-    std::string log;
+    std::string log_;
 
 };
 
+}  // namespace log
 
 #endif //LOG_LOGDATA_H

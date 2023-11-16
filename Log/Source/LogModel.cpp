@@ -12,31 +12,33 @@
 /********* 宏定义 **********/
 #define TAG "LogModel"
 
+namespace log {
 
-LogModel::LogModel(const std::string &logFileDir) : mmapImpl(nullptr) {
-    // 进行 mmap 映射
-    this->mmapImpl = std::make_shared<LogMmap>(logFileDir);
+LogModel::LogModel(const std::string &logFileDir) : mmapImpl_(nullptr) {
+    // 进行 Mmap 映射
+    this->mmapImpl_ = std::make_shared<LogMmap>(logFileDir);
 }
 
-bool LogModel::writeLogToFile(const std::shared_ptr<LogData> &logData) {
+bool LogModel::WriteLogToFile(const std::shared_ptr<LogData> &logData) {
 
-    if (LogStrategy::LOG_MMAP == this->mmapImpl->getLogStrategy()) {
+    if (LogStrategy::LOG_MMAP == this->mmapImpl_->GetLogStrategy()) {
 
-        // 如果是 mmap 机制
-        this->mmapImpl->writeLogToFileInMmap(logData);
+        // 如果是 Mmap 机制
+        this->mmapImpl_->WriteLogToFileInMmap(logData);
 
-    } else if (LogStrategy::LOG_MEMORY == this->mmapImpl->getLogStrategy()) {
+    } else if (LogStrategy::LOG_MEMORY == this->mmapImpl_->GetLogStrategy()) {
 
         // 如果是内存缓存机制
-        this->mmapImpl->writeLogToFileInMem(logData);
+        this->mmapImpl_->WriteLogToFileInMem(logData);
 
     } else {
         if (DEBUG) {
-            LogTools::printLog(LogLevel::Error, TAG, LOG_THREAD_NAME,
-                               ">>> 无法存储日志，请重新初始化日志存储策略！");
+            tool::PrintLog(LogLevel::Error, TAG, LOG_THREAD_NAME,
+                           ">>> 无法存储日志，请重新初始化日志存储策略！");
         }
         return false;
     }
     return true;
 }
 
+}  // namespace log

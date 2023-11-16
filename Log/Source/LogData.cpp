@@ -4,36 +4,38 @@
 
 #include "LogData.h"
 
+namespace log {
 
 LogData::LogData(const LogType type,
                  const LogLevel level,
                  const std::string &tag,
                  std::string log) :
-        type(type),
-        level(level),
-        tag(tag),
-        log(std::move(log)) {
+        type_(type),
+        level_(level),
+        tag_(tag),
+        log_(std::move(log)) {
     tag.data();
     tag.c_str();
 }
 
-LogLevel LogData::getLevel() const {
-    return this->level;
+LogLevel LogData::GetLevel() const {
+    return this->level_;
 }
 
-std::string LogData::getTag() const {
-    return this->tag;
+std::string LogData::GetTag() const {
+    return this->tag_;
 }
 
-std::string LogData::getLog() const {
-    return this->log;
+std::string LogData::GetLog() const {
+    return this->log_;
 }
 
-LogType LogData::getType() const {
-    return this->type;
+LogType LogData::GetType() const {
+    return this->type_;
 }
 
-void LogData::setLog(const std::string &log) {
-    this->log = log;
+void LogData::SetLog(const std::string &log) {
+    this->log_ = log;
 }
 
+}  // namespace log

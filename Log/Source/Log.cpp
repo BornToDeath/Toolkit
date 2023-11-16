@@ -6,7 +6,6 @@
  * 系统头文件
  */
 #include <thread>
-#include <sys/prctl.h>
 #include <queue>
 #include <cstring>
 #include <cstdarg>
@@ -16,7 +15,7 @@
  * 自定义头文件
  */
 #include "Log.h"
-#include "LogImpl.h"
+#include "Logger.h"
 #include "LogTools.h"
 
 /**
@@ -24,124 +23,111 @@
  */
 #define TAG "Log"
 
+using namespace log;
 
 // 标识日志模块是否进行了初始化
 static std::atomic<bool> isInit(false);
 
-
-bool Log::init(const char *const rootDir) {
-
-    // 获取线程名
-    char threadName[THREAD_NAME_MAX_LEN] = {0};
-    prctl(PR_GET_NAME, threadName);
+bool Log::Init(const char *const rootDir) {
 
     if (DEBUG) {
-        LogTools::printLog(LogLevel::Debug, TAG, threadName, ">>> 初始化日志模块");
+        tool::PrintLog(LogLevel::Debug, TAG, ">>> 初始化日志模块");
     }
 
-    if (rootDir == nullptr || strlen(rootDir) == 0 || !LogTools::createMultiLevelDir(rootDir)) {
+    if (rootDir == nullptr || strlen(rootDir) == 0 || !tool::CreateMultiLevelDir(rootDir)) {
         if (DEBUG) {
-            LogTools::printLog(LogLevel::Error, TAG, threadName,
-                               ">>> 日志根目录初始化失败！日志根目录：%s，errno = %d", rootDir, errno);
+            tool::PrintLog(LogLevel::Error, TAG,
+                           ">>> 日志根目录初始化失败! 日志根目录: %s, errno=%d (%s)",
+                           rootDir, errno, strerror(errno));
         }
         return false;
     }
-
-    // 设置初始化标志位为 true
-    isInit.store(true);
 
     std::string rootDirStr(rootDir);
     if (rootDirStr[rootDirStr.length() - 1] != '/') {
         rootDirStr.push_back('/');
     }
 
-    // 将 logRootDir 传递给 LogImpl
-    LogImpl::setLogRootDir(rootDirStr);
-
-    if (DEBUG) {
-        LogTools::printLog(LogLevel::Debug, TAG, threadName, ">>> 日志存储根目录为：%s", rootDirStr.c_str());
-    }
-
-    return true;
-}
-
-void Log::release() {
-    isInit.store(false);
-    LogImpl::getInstance()->releaseSingleton();
-}
-
-void Log::debug(const char *tag, const char *format, ...) {
-
-    // 对可变参数进行组合，合成一条完整的日志数据
-    char logText[LOG_TEXT_MAX_LEN] = {0};
-    va_list arg_list;
-    va_start(arg_list, format);
-    vsnprintf(logText, LOG_TEXT_MAX_LEN, format, arg_list);
-    va_end(arg_list);
-
-    Log::save(LogType::Normal, LogLevel::Debug, tag, logText);
-}
-
-void Log::info(const char *tag, const char *format, ...) {
-
-    // 对可变参数进行组合，合成一条完整的日志数据
-    char logText[LOG_TEXT_MAX_LEN] = {0};
-    va_list arg_list;
-    va_start(arg_list, format);
-    vsnprintf(logText, LOG_TEXT_MAX_LEN, format, arg_list);
-    va_end(arg_list);
-
-    Log::save(LogType::Normal, LogLevel::Info, tag, logText);
-}
-
-void Log::warn(const char *tag, const char *format, ...) {
-
-    // 对可变参数进行组合，合成一条完整的日志数据
-    char logText[LOG_TEXT_MAX_LEN] = {0};
-    va_list arg_list;
-    va_start(arg_list, format);
-    vsnprintf(logText, LOG_TEXT_MAX_LEN, format, arg_list);
-    va_end(arg_list);
-
-    Log::save(LogType::Normal, LogLevel::Warn, tag, logText);
-}
-
-void Log::error(const char *tag, const char *format, ...) {
-
-    // 对可变参数进行组合，合成一条完整的日志数据
-    char logText[LOG_TEXT_MAX_LEN] = {0};
-    va_list arg_list;
-    va_start(arg_list, format);
-    vsnprintf(logText, LOG_TEXT_MAX_LEN, format, arg_list);
-    va_end(arg_list);
-
-    Log::save(LogType::Error, LogLevel::Error, tag, logText);
-}
-
-bool Log::save(LogType type, LogLevel level, const char *tag, const char *log) {
-
-    // 获取线程名
-    char threadName[THREAD_NAME_MAX_LEN] = {0};
-    prctl(PR_GET_NAME, threadName);
-
-    // 日志输出到控制台
-    LogTools::printLog(level, tag, threadName, "%s", log);
-
-    if (!isInit) {
-        LogTools::printLog(level, tag, threadName, ">>> 日志根目录尚未初始化，日志存储失败！");
+    if (!Logger::Singleton().Init(rootDirStr)) {
+        tool::PrintLog(LogLevel::Error, TAG, ">>> Logger Init failed");
         return false;
     }
 
-    // 日志存储器
-    auto logger = LogImpl::getInstance();
-    if (logger == nullptr) {
-        if (DEBUG) {
-            LogTools::printLog(LogLevel::Error, TAG, threadName, ">>> LogImpl::logger == nullptr !");
-        }
+    if (DEBUG) {
+        tool::PrintLog(LogLevel::Debug, TAG, ">>> 日志存储根目录为: %s", rootDirStr.c_str());
+    }
+
+    // 设置初始化标志位为 true
+    isInit.store(true);
+    return true;
+}
+
+void Log::Stop() {
+    isInit.store(false);
+    Logger::Singleton().Stop();
+}
+
+void Log::Debug(const char *tag, const char *format, ...) {
+
+    // 对可变参数进行组合，合成一条完整的日志数据
+    char logText[LOG_TEXT_MAX_LEN] = {0};
+    va_list arg_list;
+    va_start(arg_list, format);
+    vsnprintf(logText, LOG_TEXT_MAX_LEN, format, arg_list);
+    va_end(arg_list);
+
+    Log::Save(LogType::Normal, LogLevel::Debug, tag, logText);
+}
+
+void Log::Info(const char *tag, const char *format, ...) {
+
+    // 对可变参数进行组合，合成一条完整的日志数据
+    char logText[LOG_TEXT_MAX_LEN] = {0};
+    va_list arg_list;
+    va_start(arg_list, format);
+    vsnprintf(logText, LOG_TEXT_MAX_LEN, format, arg_list);
+    va_end(arg_list);
+
+    Log::Save(LogType::Normal, LogLevel::Info, tag, logText);
+}
+
+void Log::Warn(const char *tag, const char *format, ...) {
+
+    // 对可变参数进行组合，合成一条完整的日志数据
+    char logText[LOG_TEXT_MAX_LEN] = {0};
+    va_list arg_list;
+    va_start(arg_list, format);
+    vsnprintf(logText, LOG_TEXT_MAX_LEN, format, arg_list);
+    va_end(arg_list);
+
+    Log::Save(LogType::Normal, LogLevel::Warn, tag, logText);
+}
+
+void Log::Error(const char *tag, const char *format, ...) {
+
+    // 对可变参数进行组合，合成一条完整的日志数据
+    char logText[LOG_TEXT_MAX_LEN] = {0};
+    va_list arg_list;
+    va_start(arg_list, format);
+    vsnprintf(logText, LOG_TEXT_MAX_LEN, format, arg_list);
+    va_end(arg_list);
+
+    // Normal 文件中也记录一份, 方便阅读日志
+    Log::Save(LogType::Normal, LogLevel::Error, tag, logText);
+    Log::Save(LogType::Error, LogLevel::Error, tag, logText);
+}
+
+bool Log::Save(LogType type, LogLevel level, const char *tag, const char *log) {
+
+    // 日志输出到控制台
+    tool::PrintLog(level, tag, "%s", log);
+
+    if (!isInit) {
+        tool::PrintLog(level, tag, ">>> 日志根目录尚未初始化, 日志存储失败!");
         return false;
     }
 
     // 存储日志
-    logger->handleLog(type, level, tag, threadName, log);
+    Logger::Singleton().WriteLog(type, level, tag, log);
     return true;
 }

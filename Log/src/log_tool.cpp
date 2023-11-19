@@ -74,7 +74,7 @@ void PrintLog(LogLevel level, const char *tag, const char *format, ...) {
     printf("%s\n", log.c_str());
 }
 
-std::string getLogStrategyName(LogStrategy strategy) {
+std::string GetLogStrategyName(LogStrategy strategy) {
     switch (strategy) {
         case LogStrategy::LOG_MMAP:
             return "LOG_MMAP";

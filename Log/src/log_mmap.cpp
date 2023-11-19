@@ -231,7 +231,7 @@ bool LogMmap::Mmap(const char *const filePath) {
     if (DEBUG) {
         tool::PrintLog(LogLevel::Debug, TAG, LOG_THREAD_NAME,
                        ">>> 日志存储策略：%s",
-                       tool::getLogStrategyName(this->logStrategy_).c_str());
+                       tool::GetLogStrategyName(this->logStrategy_).c_str());
 
         if (this->logStrategy_ == LogStrategy::LOG_MMAP) {
 
@@ -313,7 +313,7 @@ void LogMmap::Msync(bool bSync) {
         if (DEBUG) {
             tool::PrintLog(LogLevel::Debug, TAG, LOG_THREAD_NAME,
                            ">>> 不是 Mmap 缓存策略，不能同步！当前缓存策略是：%s",
-                           tool::getLogStrategyName(this->logStrategy_).c_str());
+                           tool::GetLogStrategyName(this->logStrategy_).c_str());
         }
         return;
     }

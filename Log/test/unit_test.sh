@@ -8,13 +8,30 @@ cd $(dirname $0) || exit
 
 # ========== 一些开关 ==========
 
-# 是否是测试环境
-LOG_TEST="no"
+# 编译环境开关
+BUILD_DEBUG="yes"
 
 # 单元测试开关
-UNIT_TEST="no"
+UNIT_TEST="yes"
+
+# 覆盖率统计开关
+COVERAGE="yes"
 
 # ============================
+
+build_params=""
+
+if [ ${BUILD_DEBUG} == "yes" ]; then
+  build_params+=" -DCMAKE_BUILD_TYPE=DEBUG"
+fi
+
+if [ ${UNIT_TEST} == "yes" ]; then
+  build_params+=" -DLOG_TEST=ON"
+fi
+
+if [ ${COVERAGE} == "yes" ]; then
+  build_params+=" -DCOVERAGE=ON"
+fi
 
 # 读取旧的 MD5
 MD5_PATH="./build/CMakeLists.txt.md5"
@@ -42,16 +59,7 @@ if [ "${oldMD5}" == "${newMD5}" ]; then
 else
   echo "MD5不相等，正在重新编译..."
   rm -rf ./build && mkdir ./build && cd ./build || exit
-
-  if [ ${LOG_TEST} == "yes" ]; then
-    if [ ${UNIT_TEST} == "yes" ]; then
-      cmake ../.. -DLOG_TEST=YES -DUNIT_TEST=YES || (echo "cmake失败！" && exit)
-    else
-      cmake ../.. -DLOG_TEST=YES || (echo "cmake失败！" && exit)
-    fi
-  else
-    cmake ../.. || (echo "cmake失败！" && exit)
-  fi
+  cmake ../.. || (echo "cmake失败！" && exit)
 
   # 保存新的 MD5
   touch CMakeLists.txt.md5 || (echo "有问题！" && exit)
@@ -66,7 +74,7 @@ make -j8 || exit
 
 echo "============================================================="
 
-if [ ${LOG_TEST} == "yes" ]; then
+if [ ${BUILD_DEBUG} == "yes" ]; then
   function onSigInt() {
     echo " ( Ctrl+C ) "
   }
@@ -75,18 +83,18 @@ if [ ${LOG_TEST} == "yes" ]; then
   trap onSigInt INT
 
   # 运行
-  chmod +x ./runLog && ./runLog
+  chmod +x ./run_log_unittest && ./run_log_unittest
 fi
 
 echo "============================================================="
 
 # 统计覆盖率
-if [ ${UNIT_TEST} == "yes" ]; then
+if [ ${COVERAGE} == "yes" ]; then
   echo "覆盖率统计..."
-  rm -rf ./覆盖率结果/
-  lcov --capture --directory ./ --output-file all.info || exit
+  rm -rf ./result/
+  lcov --capture --directory ./ --output-file all.info --quiet || exit
   # 移除不需要统计的文件
-  lcov --remove all.info '/usr/include/*' '*/test/*' -o result.info || exit
+  lcov --remove all.info '/usr/include/*' '*/test/*' '*/gtest/*' --quiet -o coverage.info || exit
   # 可视化
-  genhtml result.info --output-directory ./覆盖率结果/ || exit
+  genhtml coverage.info --output-directory ./coverage/ || exit
 fi

@@ -43,7 +43,7 @@ void PrintLog(LogLevel level, const char *tag, const char *format, ...);
  * @param strategy
  * @return
  */
-std::string getLogStrategyName(LogStrategy strategy);
+std::string GetLogStrategyName(LogStrategy strategy);
 
 /**
  * 根据日志类型获取类型名

@@ -24,6 +24,12 @@ target_include_directories(
         include
 )
 
+# 覆盖率统计
+option(COVERAGE "set ON to open coverage statistics" OFF)
+if (COVERAGE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
+endif ()
+
 # -------------------- 单元测试 --------------------
 option(LOG_TEST "set ON to run log unit test" OFF)
 if (LOG_TEST)
@@ -39,10 +45,4 @@ if (LOG_TEST)
             pthread
             GTest::gtest_main
     )
-endif ()
-
-# 覆盖率统计
-option(COVERAGE "set ON to open coverage statistics" OFF)
-if (COVERAGE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
 endif ()

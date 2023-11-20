@@ -38,11 +38,9 @@ if (LOG_TEST)
     find_package(GTest CONFIG REQUIRED)
 
     # 编译成可执行程序
+    aux_source_directory(test LOG_TEST_SRCS)
     set(TEST_BINARY_NAME run_log_unittest)
-    add_executable(${TEST_BINARY_NAME}
-            test/log_tool_test.cpp
-            test/log_model_test.cpp
-    )
+    add_executable(${TEST_BINARY_NAME} ${LOG_TEST_SRCS})
     target_link_libraries(${TEST_BINARY_NAME}
             log_static
             pthread

@@ -16,7 +16,6 @@
 #include <sstream>
 
 /* 自定义头文件 */
-#include "log_encryptor.h"
 #include "log_tool.h"
 
 /* 自定义宏 */
@@ -40,9 +39,9 @@ bool Logger::Init(const std::string &log_dir) {
 
         char thread_name[THREAD_NAME_MAX_LEN] = {0};
         prctl(PR_GET_NAME, thread_name);
-        tool::PrintLog(LogLevel::Debug, TAG, LOG_THREAD_NAME,
-                       ">>> 启动日志存储子线程, 线程名: %s , 线程 ID: %ld",
-                       thread_name, std::this_thread::get_id());
+        tool::PrintLog(LogLevel::Debug, TAG,
+                       ">>> 启动日志存储子线程, 线程名: %s , 线程 ID: %ld", thread_name,
+                       std::this_thread::get_id());
 
         // 死循环处理日志
         while (!is_quit_) {
@@ -149,17 +148,15 @@ bool Logger::WriteLog(const std::shared_ptr<LogData> &log_data) {
         return true;
     }
 
-    std::string encrypted_log_text;
+    std::string log_text = log_data->GetLog();
 
-    if (DEBUG) {
-        encrypted_log_text = log_data->GetLog();
-    } else {
-        // 日志加密
-        LogEncryptor::EncryptLog(log_data->GetLog(), encrypted_log_text);
-    }
+#ifdef LOG_ENCRYPT
+    // 日志加密
+    tool::EncryptLog(log_data->GetLog(), log_text);
+#endif
 
-    encrypted_log_text.append("\n");
-    log_data->SetLog(encrypted_log_text);
+    log_text.append("\n");
+    log_data->SetLog(log_text);
 
     // 如果 map 中没有对应日志类型的日志存储器，则创建对应的日志存储器并记录到 map 中
     if (this->log_container_.find(log_data->GetType()) == this->log_container_.end()) {

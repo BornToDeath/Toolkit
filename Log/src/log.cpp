@@ -30,6 +30,10 @@ using namespace log;
 static std::atomic<bool> is_init(false);
 
 bool Log::Init(const char *const root_dir) {
+    if (is_init) {
+        tool::PrintLog(LogLevel::Debug, TAG, ">>> 日志模块已经初始化, 日志目录: %s", root_dir);
+        return true;
+    }
 
     if (DEBUG) {
         tool::PrintLog(LogLevel::Debug, TAG, ">>> 初始化日志模块");
@@ -58,8 +62,8 @@ bool Log::Init(const char *const root_dir) {
 }
 
 void Log::Stop() {
-    is_init.store(false);
     Logger::Singleton().Stop();
+    is_init.store(false);
 }
 
 void Log::Debug(const char *tag, const char *format, ...) {

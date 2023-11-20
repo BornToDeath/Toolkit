@@ -14,8 +14,7 @@ LogData::LogData(const LogType type,
         level_(level),
         tag_(tag),
         log_(std::move(log)) {
-    tag.data();
-    tag.c_str();
+
 }
 
 LogLevel LogData::GetLevel() const {

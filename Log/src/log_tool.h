@@ -88,6 +88,20 @@ bool CreateMultiLevelDir(const char *dir);
  */
 std::string GetCurrentDateTime(const char *format);
 
+/**
+ * 对字符串进行 base64 加密
+ * @param input_log  加密前日志
+ * @param output_log 加密后日志
+ */
+void EncryptLog(const std::string &input_log, std::string &output_log);
+
+// 仅限内部使用
+namespace internal {
+
+static char *Base64Encode(const char *data, size_t data_len);
+
+}  // namespace internal
+
 }  // namespace tool
 }  // namespace log
 

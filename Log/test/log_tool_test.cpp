@@ -114,3 +114,11 @@ TEST(LogToolTest, GetCurrentDateTime) {
     auto date = tool::GetCurrentDateTime("%Y-%m-%d %H:%M:%S");
     EXPECT_EQ(demo.length(), date.length());
 }
+
+TEST(LogToolTest, EncryptLog) {
+    const std::string input = "Hello world";
+    std::string output;
+    tool::EncryptLog(input, output);
+    std::cout << output.length() << "|" << output << std::endl;
+    EXPECT_FALSE(output.empty());
+}

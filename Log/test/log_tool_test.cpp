@@ -82,7 +82,7 @@ TEST(LogToolTest, GetFileSize) {
 }
 
 TEST(LogToolTest, CreateDirIfNotExist) {
-    const std::string root_dir = "/home/Tookit/Log/test/";
+    const std::string root_dir = "/home/Tookit/Log/test/build/";
     auto res = tool::CreateDirIfNotExist(nullptr);
     EXPECT_FALSE(res);
 

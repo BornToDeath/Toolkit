@@ -17,11 +17,6 @@ namespace log {
 
 void LogEncryptor::EncryptLog(const std::string &input_log, std::string &output_log) {
 
-    if (DEBUG) {
-        output_log = input_log;
-        return;
-    }
-
     const std::string key = LOG_ENCRYPT_KEY;
     size_t key_len = key.length();
 

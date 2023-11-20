@@ -36,11 +36,8 @@ bool Log::Init(const char *const root_dir) {
     }
 
     if (root_dir == nullptr || strlen(root_dir) == 0 || !tool::CreateMultiLevelDir(root_dir)) {
-        if (DEBUG) {
-            tool::PrintLog(LogLevel::Error, TAG,
-                           ">>> 日志根目录初始化失败! 日志根目录: %s, errno=%d (%s)",
-                           root_dir, errno, strerror(errno));
-        }
+        tool::PrintLog(LogLevel::Error, TAG, ">>> 日志根目录初始化失败! 日志根目录: %s, errno=%d (%s)",
+                       root_dir, errno, strerror(errno));
         return false;
     }
 
@@ -53,10 +50,7 @@ bool Log::Init(const char *const root_dir) {
         tool::PrintLog(LogLevel::Error, TAG, ">>> Logger Init failed");
         return false;
     }
-
-    if (DEBUG) {
-        tool::PrintLog(LogLevel::Debug, TAG, ">>> 日志存储根目录为: %s", root_dir_str.c_str());
-    }
+    tool::PrintLog(LogLevel::Debug, TAG, ">>> 日志存储根目录为: %s", root_dir_str.c_str());
 
     // 设置初始化标志位为 true
     is_init.store(true);

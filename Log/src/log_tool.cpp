@@ -32,6 +32,10 @@ unsigned long long CurrentTimeMills() {
 
 void PrintLog(LogLevel level, const char *tag, const char *format, ...) {
 
+    if (!DEBUG) {
+        return;
+    }
+
     // 获取线程名
     char thread_name[THREAD_NAME_MAX_LEN] = {0};
     prctl(PR_GET_NAME, thread_name);

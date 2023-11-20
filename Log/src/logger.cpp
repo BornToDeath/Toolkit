@@ -38,13 +38,11 @@ bool Logger::Init(const std::string &log_dir) {
         // 设置日志存储线程的线程名
         prctl(PR_SET_NAME, LOG_THREAD_NAME);
 
-        if (DEBUG) {
-            char thread_name[THREAD_NAME_MAX_LEN] = {0};
-            prctl(PR_GET_NAME, thread_name);
-            tool::PrintLog(LogLevel::Debug, TAG, LOG_THREAD_NAME,
-                           ">>> 启动日志存储子线程, 线程名: %s , 线程 ID: %ld",
-                           thread_name, std::this_thread::get_id());
-        }
+        char thread_name[THREAD_NAME_MAX_LEN] = {0};
+        prctl(PR_GET_NAME, thread_name);
+        tool::PrintLog(LogLevel::Debug, TAG, LOG_THREAD_NAME,
+                       ">>> 启动日志存储子线程, 线程名: %s , 线程 ID: %ld",
+                       thread_name, std::this_thread::get_id());
 
         // 死循环处理日志
         while (!is_quit_) {
@@ -87,11 +85,9 @@ bool Logger::Init(const std::string &log_dir) {
             this->WriteLog(log);
         }
 
-        if (DEBUG) {
-            tool::PrintLog(LogLevel::Info, TAG, ">>> 日志线程退出!");
-        }
+        tool::PrintLog(LogLevel::Info, TAG, ">>> 日志线程退出!");
     };
-    log_thread_ = std::unique_ptr<std::thread>(new std::thread(runnable));
+    log_thread_ = std::make_unique<std::thread>(runnable);
     return true;
 }
 
@@ -155,8 +151,12 @@ bool Logger::WriteLog(const std::shared_ptr<LogData> &log_data) {
 
     std::string encrypted_log_text;
 
-    // 日志加密
-    LogEncryptor::EncryptLog(log_data->GetLog(), encrypted_log_text);
+    if (DEBUG) {
+        encrypted_log_text = log_data->GetLog();
+    } else {
+        // 日志加密
+        LogEncryptor::EncryptLog(log_data->GetLog(), encrypted_log_text);
+    }
 
     encrypted_log_text.append("\n");
     log_data->SetLog(encrypted_log_text);
@@ -167,11 +167,8 @@ bool Logger::WriteLog(const std::shared_ptr<LogData> &log_data) {
         std::string log_dir = log_root_dir_ + tool::GetLogTypeName(log_data->GetType()) + "/";
 
         if (!tool::CreateDirIfNotExist(log_dir.c_str())) {
-            if (DEBUG) {
-                tool::PrintLog(LogLevel::Error, TAG, LOG_THREAD_NAME,
-                               ">>> 创建日志目录 %s 失败，errno = %d",
-                               log_dir.c_str(), errno);
-            }
+            tool::PrintLog(LogLevel::Error, TAG, ">>> 创建日志目录 %s 失败，errno = %d",
+                           log_dir.c_str(), errno);
 //            Log::setIsInit(false);  // 无需调用此方法，因为如果设置为 false ，则其他类型的日志也无法存储
             return false;
         }

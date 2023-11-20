@@ -20,7 +20,7 @@
 #ifdef BUILD_TYPE_DEBUG
 #define DEBUG 1
 #else
-#define DEBUG 1
+#define DEBUG 0
 #endif
 
 /**

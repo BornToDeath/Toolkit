@@ -59,7 +59,7 @@ if [ "${oldMD5}" == "${newMD5}" ]; then
 else
   echo "MD5不相等，正在重新编译..."
   rm -rf ./build && mkdir ./build && cd ./build || exit
-  cmake ../.. || (echo "cmake失败！" && exit)
+  cmake ${build_params} ../.. || (echo "cmake失败！" && exit)
 
   # 保存新的 MD5
   touch CMakeLists.txt.md5 || (echo "有问题！" && exit)
@@ -83,7 +83,7 @@ if [ ${BUILD_DEBUG} == "yes" ]; then
   trap onSigInt INT
 
   # 运行
-  chmod +x ./run_log_unittest && ./run_log_unittest
+  chmod +x ./run_log_unittest && ./run_log_unittest || exit
 fi
 
 echo "============================================================="

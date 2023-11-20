@@ -38,9 +38,12 @@ if (LOG_TEST)
     find_package(GTest CONFIG REQUIRED)
 
     # 编译成可执行程序
-    set(BINARY_NAME run_log_unittest)
-    add_executable(${BINARY_NAME} test/log_tool_test.cpp)
-    target_link_libraries(${BINARY_NAME}
+    set(TEST_BINARY_NAME run_log_unittest)
+    add_executable(${TEST_BINARY_NAME}
+            test/log_tool_test.cpp
+            test/log_model_test.cpp
+    )
+    target_link_libraries(${TEST_BINARY_NAME}
             log_static
             pthread
             GTest::gtest_main

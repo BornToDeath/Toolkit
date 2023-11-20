@@ -80,13 +80,12 @@ public:
      */
     virtual void Munmap() = 0;
 
-
     /**
      * 同步内容
-     * @param bSync true: 同步写回
-     *              false: 异步写回
+     * @param sync true : 同步写回
+     *             false: 异步写回
      */
-    virtual void Msync(bool bSync) = 0;
+    virtual void Msync(bool sync) = 0;
 };
 
 }  // namespace log

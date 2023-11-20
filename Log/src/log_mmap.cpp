@@ -30,23 +30,23 @@
 
 namespace log {
 
-LogMmap::LogMmap(const std::string &logFileDir) :
-        logMmapAddr_(nullptr),
-        logMemAddr_(nullptr),
-        logLengthOffset_(0),
-        memBufSize_(0),
-        logStrategy_(LogStrategy::LOG_MMAP_FAIL),
-        logStorageHelper_(nullptr),
-        logFilePath_(logFileDir + LOG_CUR_FILE_NAME LOG_FILE_SUF) {
+LogMmap::LogMmap(const std::string &log_file_dir) :
+        log_mmap_addr_(nullptr),
+        log_mem_addr_(nullptr),
+        log_length_offset_(0),
+        mem_buf_size_(0),
+        log_strategy_(LogStrategy::LOG_MMAP_FAIL),
+        log_storage_helper_(nullptr),
+        log_file_path_(log_file_dir + LOG_CUR_FILE_NAME LOG_FILE_SUF) {
 
-    this->logStorageHelper_ = std::make_shared<LogStorageHelper>(logFileDir);
+    this->log_storage_helper_ = std::make_shared<LogStorageHelper>(log_file_dir);
 
     // 尝试进行 Mmap 映射，如果失败则尝试创建内存缓存
-    bool isOk = this->Mmap(logFilePath_.c_str());
-    if (!isOk) {
+    bool is_ok = this->Mmap(log_file_path_.c_str());
+    if (!is_ok) {
         if (DEBUG) {
             tool::PrintLog(LogLevel::Error, TAG, LOG_THREAD_NAME,
-                           ">>> Mmap 映射失败！映射的文件为：%s", logFilePath_.c_str());
+                           ">>> Mmap 映射失败！映射的文件为：%s", log_file_path_.c_str());
         }
 //        Log::setIsInit(false);  // 无需调用此方法，因为如果设置为 false 则影响其他类型日志的存储
     }
@@ -57,13 +57,13 @@ LogMmap::~LogMmap() {
     // 取消映射
     Munmap();
 
-    if (this->logMmapAddr_) {
-        delete[] this->logMmapAddr_;
-        this->logMmapAddr_ = nullptr;
+    if (this->log_mmap_addr_) {
+        delete[] this->log_mmap_addr_;
+        this->log_mmap_addr_ = nullptr;
     }
-    if (this->logMemAddr_) {
-        delete[] this->logMemAddr_;
-        this->logMemAddr_ = nullptr;
+    if (this->log_mem_addr_) {
+        delete[] this->log_mem_addr_;
+        this->log_mem_addr_ = nullptr;
     }
 }
 
@@ -74,24 +74,24 @@ LogMmap::~LogMmap() {
  *   2. 尝试进行 Mmap 映射
  *   3. 如果 Mmap 映射失败则尝试创建内存缓存
  *   4. 如果内存缓存失败则最终失败
- * @param filePath mmap映射的文件名（绝对路径）
+ * @param file_path mmap映射的文件名（绝对路径）
  */
-bool LogMmap::Mmap(const char *const filePath) {
+bool LogMmap::Mmap(const char *const file_path) {
 
-    this->logStrategy_ = LogStrategy::LOG_MMAP_FAIL;
+    this->log_strategy_ = LogStrategy::LOG_MMAP_FAIL;
 
     // 标识日志待写入的文件位置
-    long logOffset = 0;
+    long log_offset = 0;
 
     // 判断日志文件是否准备好
-    LogFileStatus status = this->logStorageHelper_->PrepareLogFile(filePath, logOffset);
+    LogFileStatus status = this->log_storage_helper_->PrepareLogFile(file_path, log_offset);
 
     if (status == LogFileStatus::FAILED) {
 
         // 日志文件打开失败
         if (DEBUG) {
             tool::PrintLog(LogLevel::Error, TAG, LOG_THREAD_NAME,
-                           ">>> 打开日志文件 %s 失败，errno = %d", filePath, errno);
+                           ">>> 打开日志文件 %s 失败，errno = %d", file_path, errno);
         }
 
         return false;
@@ -109,24 +109,24 @@ bool LogMmap::Mmap(const char *const filePath) {
          */
 
         // 删除历史日志文件
-        int deleteFileNums = this->logStorageHelper_->DeleteOldestLogFile();
+        int delete_file_nums = this->log_storage_helper_->DeleteOldestLogFile();
         if (DEBUG) {
             tool::PrintLog(LogLevel::Info, TAG, LOG_THREAD_NAME,
-                           ">>> 删除历史日志文件 %d 个", deleteFileNums);
+                           ">>> 删除历史日志文件 %d 个", delete_file_nums);
         }
 
         // 创建新的日志文件并重新映射
-        this->logLengthOffset_ = 0;
+        this->log_length_offset_ = 0;
 
-        bool isOk = this->logStorageHelper_->RenameLogFile();
-        if (!isOk) {
+        bool is_ok = this->log_storage_helper_->RenameLogFile();
+        if (!is_ok) {
             return false;
         }
 
         // 进行 Mmap 映射
-        isOk = this->Mmap(filePath);
+        is_ok = this->Mmap(file_path);
 
-        return isOk;
+        return is_ok;
 
     } else if (status != LogFileStatus::OK) {
 
@@ -139,7 +139,7 @@ bool LogMmap::Mmap(const char *const filePath) {
     }
 
     // 当前日志文件未满，更新日志文件中日志数据的索引值
-    this->logLengthOffset_ = logOffset;
+    this->log_length_offset_ = log_offset;
 
     /**
      * 下面进行 Mmap 映射
@@ -154,12 +154,12 @@ bool LogMmap::Mmap(const char *const filePath) {
      *          关于errno各个取值含义参考：
      *          https://blog.csdn.net/kofiory/article/details/5790409
      */
-    int fd = open(filePath, O_CREAT | O_RDWR, 0660);
+    int fd = open(file_path, O_CREAT | O_RDWR, 0660);
 
     if (-1 == fd) {
         if (DEBUG) {
             tool::PrintLog(LogLevel::Error, TAG, LOG_THREAD_NAME,
-                           ">>> 打开日志文件 %s 失败: errno = %d", filePath, errno);
+                           ">>> 打开日志文件 %s 失败: errno = %d", file_path, errno);
         }
         return false;
     }
@@ -180,16 +180,15 @@ bool LogMmap::Mmap(const char *const filePath) {
      *                 映射失败：返回 MAP_FAILED
      * 参考     :       https://juejin.im/post/6844903855235268615
      */
-    char *pMap = (char *) ::mmap(nullptr, LOG_MMAP_LEN, PROT_READ | PROT_WRITE,
-                                 MAP_SHARED, fd, 0);
+    char *mmap_addr = (char *) ::mmap(nullptr, LOG_MMAP_LEN, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 
-    if (nullptr != pMap && pMap != MAP_FAILED) {
+    if (nullptr != mmap_addr && mmap_addr != MAP_FAILED) {
 
         // 映射成功，走mmap缓存。
-        this->logStrategy_ = LogStrategy::LOG_MMAP;
+        this->log_strategy_ = LogStrategy::LOG_MMAP;
 
         // 记录映射的起始内存地址
-        this->logMmapAddr_ = pMap;
+        this->log_mmap_addr_ = mmap_addr;
 
     } else {
         // 映射失败，创建内存缓存，如果内存缓存创建失败，则代表失败
@@ -199,21 +198,21 @@ bool LogMmap::Mmap(const char *const filePath) {
                            ">>> mmap映射失败！尝试创建内存缓存！");
         }
 
-        char *memAddr = (char *) malloc(LOG_MEMORY_LEN);
+        char *mem_addr = (char *) malloc(LOG_MEMORY_LEN);
 
-        if (nullptr != memAddr) {
+        if (nullptr != mem_addr) {
 
-            this->logStrategy_ = LogStrategy::LOG_MEMORY;
+            this->log_strategy_ = LogStrategy::LOG_MEMORY;
 
-            memset(memAddr, 0, LOG_MEMORY_LEN);
+            memset(mem_addr, 0, LOG_MEMORY_LEN);
 
             // 记录内存缓存的起始地址
-            this->logMemAddr_ = memAddr;
-            this->memBufSize_ = 0;
+            this->log_mem_addr_ = mem_addr;
+            this->mem_buf_size_ = 0;
 
         } else {
 
-            this->logStrategy_ = LogStrategy::LOG_MEMORY_FAIL;
+            this->log_strategy_ = LogStrategy::LOG_MEMORY_FAIL;
 
             if (DEBUG) {
                 tool::PrintLog(LogLevel::Error, TAG, LOG_THREAD_NAME,
@@ -231,14 +230,14 @@ bool LogMmap::Mmap(const char *const filePath) {
     if (DEBUG) {
         tool::PrintLog(LogLevel::Debug, TAG, LOG_THREAD_NAME,
                        ">>> 日志存储策略：%s",
-                       tool::GetLogStrategyName(this->logStrategy_).c_str());
+                       tool::GetLogStrategyName(this->log_strategy_).c_str());
 
-        if (this->logStrategy_ == LogStrategy::LOG_MMAP) {
+        if (this->log_strategy_ == LogStrategy::LOG_MMAP) {
 
             tool::PrintLog(LogLevel::Debug, TAG, LOG_THREAD_NAME,
                            ">>> MMap映射长度：%ld 字节", LOG_MMAP_LEN);
 
-        } else if (this->logStrategy_ == LogStrategy::LOG_MEMORY) {
+        } else if (this->log_strategy_ == LogStrategy::LOG_MEMORY) {
 
             tool::PrintLog(LogLevel::Debug, TAG, LOG_THREAD_NAME,
                            ">>> 内存缓存大小：%ld 字节", LOG_MEMORY_LEN);
@@ -251,10 +250,10 @@ bool LogMmap::Mmap(const char *const filePath) {
 
 void LogMmap::Mmap(size_t length, int prot, int flags, int fd, off_t offset) {
 
-    this->logMmapAddr_ = (char *) ::mmap(nullptr, length, prot, flags, fd, offset);
+    this->log_mmap_addr_ = (char *) ::mmap(nullptr, length, prot, flags, fd, offset);
 
-    if (this->logMmapAddr_ == MAP_FAILED) {
-        this->logMmapAddr_ = nullptr;
+    if (this->log_mmap_addr_ == MAP_FAILED) {
+        this->log_mmap_addr_ = nullptr;
         return;
     }
 }
@@ -262,7 +261,7 @@ void LogMmap::Mmap(size_t length, int prot, int flags, int fd, off_t offset) {
 
 void LogMmap::Munmap() {
 
-    if (this->logStrategy_ != LogStrategy::LOG_MMAP) {
+    if (this->log_strategy_ != LogStrategy::LOG_MMAP) {
         if (DEBUG) {
             tool::PrintLog(LogLevel::Warn, TAG, LOG_THREAD_NAME,
                            ">>> 不是 Mmap 缓存策略，不能调用 Munmap() 方法！");
@@ -270,7 +269,7 @@ void LogMmap::Munmap() {
         return;
     }
 
-    if (nullptr == this->logMmapAddr_) {
+    if (nullptr == this->log_mmap_addr_) {
         return;
     }
 
@@ -282,7 +281,7 @@ void LogMmap::Munmap() {
      * @return  成功返回 0
      *          失败返回 -1
      */
-    int ret = ::munmap(this->logMmapAddr_, LOG_MMAP_LEN);
+    int ret = ::munmap(this->log_mmap_addr_, LOG_MMAP_LEN);
     if (ret == -1) {
         if (DEBUG) {
             tool::PrintLog(LogLevel::Warn, TAG, LOG_THREAD_NAME,
@@ -293,13 +292,13 @@ void LogMmap::Munmap() {
 
     // 重置相关参数
 
-    this->logMmapAddr_ = nullptr;
-    this->logMemAddr_ = nullptr;
+    this->log_mmap_addr_ = nullptr;
+    this->log_mem_addr_ = nullptr;
 
-    this->logLengthOffset_ = 0;
-    this->memBufSize_ = 0;
+    this->log_length_offset_ = 0;
+    this->mem_buf_size_ = 0;
 
-    this->logStrategy_ = LogStrategy::LOG_MMAP_FAIL;
+    this->log_strategy_ = LogStrategy::LOG_MMAP_FAIL;
 
 }
 
@@ -307,25 +306,25 @@ void LogMmap::Munmap() {
  * 保存日志数据
  * @param logData
  */
-void LogMmap::Msync(bool bSync) {
+void LogMmap::Msync(bool sync) {
 
-    if (this->logStrategy_ != LogStrategy::LOG_MMAP) {
+    if (this->log_strategy_ != LogStrategy::LOG_MMAP) {
         if (DEBUG) {
             tool::PrintLog(LogLevel::Debug, TAG, LOG_THREAD_NAME,
                            ">>> 不是 Mmap 缓存策略，不能同步！当前缓存策略是：%s",
-                           tool::GetLogStrategyName(this->logStrategy_).c_str());
+                           tool::GetLogStrategyName(this->log_strategy_).c_str());
         }
         return;
     }
 
     int ret = 0;
 
-    if (bSync) {
+    if (sync) {
         // MS_SYNC: 同步写回，等待写操作完成后才返回
-        ret = ::msync(this->logMmapAddr_, LOG_MMAP_LEN, MS_SYNC | MS_INVALIDATE);
+        ret = ::msync(this->log_mmap_addr_, LOG_MMAP_LEN, MS_SYNC | MS_INVALIDATE);
     } else {
         // MS_ASYNC: 异步写回，只是将写操作排队，并不等待写操作完成就返回
-        ret = ::msync(this->logMmapAddr_, LOG_MMAP_LEN, MS_ASYNC | MS_INVALIDATE);
+        ret = ::msync(this->log_mmap_addr_, LOG_MMAP_LEN, MS_ASYNC | MS_INVALIDATE);
     }
 
     if (ret != 0) {
@@ -334,11 +333,11 @@ void LogMmap::Msync(bool bSync) {
 
 }
 
-bool LogMmap::WriteLogToFileInMmap(const std::shared_ptr<LogData> &logData, bool bSync) {
+bool LogMmap::WriteLogToFileInMmap(const std::shared_ptr<LogData> &log_data, bool sync) {
 
     // 将日志写入mmap缓存
-    bool isOk = this->FlushLogToMmap(logData, bSync);
-    if (isOk) {
+    bool is_ok = this->FlushLogToMmap(log_data, sync);
+    if (is_ok) {
         return true;
     }
 
@@ -349,7 +348,7 @@ bool LogMmap::WriteLogToFileInMmap(const std::shared_ptr<LogData> &logData, bool
     if (DEBUG) {
         tool::PrintLog(LogLevel::Info, TAG, LOG_THREAD_NAME,
                        ">>> (MMAP)当前日志文件 %s 已满，需要创建新的日志文件",
-                       this->logFilePath_.c_str());
+                       this->log_file_path_.c_str());
     }
 
     // 解除映射关系，会自动将mmap缓存中的日志数据回写到磁盘
@@ -364,20 +363,20 @@ bool LogMmap::WriteLogToFileInMmap(const std::shared_ptr<LogData> &logData, bool
      */
 
     // 【1】删除历史日志文件
-    int deleteFileNums = this->logStorageHelper_->DeleteOldestLogFile();
+    int delete_file_nums = this->log_storage_helper_->DeleteOldestLogFile();
 
     if (DEBUG) {
         tool::PrintLog(LogLevel::Info, TAG, LOG_THREAD_NAME,
-                       ">>> 删除历史日志文件 %d 个", deleteFileNums);
+                       ">>> 删除历史日志文件 %d 个", delete_file_nums);
     }
 
     // 【2】将当前日志文件重命名
-    this->logStorageHelper_->RenameLogFile();
-    this->logLengthOffset_ = 0;
+    this->log_storage_helper_->RenameLogFile();
+    this->log_length_offset_ = 0;
 
     // 【3】新建日志文件，并重新映射
-    isOk = this->Mmap(this->logFilePath_.c_str());
-    if (!isOk) {
+    is_ok = this->Mmap(this->log_file_path_.c_str());
+    if (!is_ok) {
         if (DEBUG) {
             tool::PrintLog(LogLevel::Error, TAG, LOG_THREAD_NAME, ">>> Mmap 映射失败！");
         }
@@ -385,10 +384,10 @@ bool LogMmap::WriteLogToFileInMmap(const std::shared_ptr<LogData> &logData, bool
     }
 
     // 【4】将当前条日志写入新日志文件
-    if (this->logStrategy_ == LogStrategy::LOG_MMAP) {
-        this->FlushLogToMmap(logData, bSync);
-    } else if (this->logStrategy_ == LogStrategy::LOG_MEMORY) {
-        this->FlushLogToMem(logData);
+    if (this->log_strategy_ == LogStrategy::LOG_MMAP) {
+        this->FlushLogToMmap(log_data, sync);
+    } else if (this->log_strategy_ == LogStrategy::LOG_MEMORY) {
+        this->FlushLogToMem(log_data);
     } else {
         return false;
     }
@@ -396,12 +395,12 @@ bool LogMmap::WriteLogToFileInMmap(const std::shared_ptr<LogData> &logData, bool
     return true;
 }
 
-bool LogMmap::WriteLogToFileInMem(const std::shared_ptr<LogData> &logData) {
+bool LogMmap::WriteLogToFileInMem(const std::shared_ptr<LogData> &log_data) {
 
     // 考虑到日志文件的大小是1M的原则，即使是内存缓存，也要判断是否超过1M
-    if (this->logLengthOffset_ + logData->GetLog().size() <= LOG_MMAP_LEN) {
+    if (this->log_length_offset_ + log_data->GetLog().size() <= LOG_MMAP_LEN) {
 
-        if (this->FlushLogToMem(logData)) {
+        if (this->FlushLogToMem(log_data)) {
             return true;
         }
 
@@ -411,26 +410,26 @@ bool LogMmap::WriteLogToFileInMem(const std::shared_ptr<LogData> &logData) {
         }
 
         // 注意，打开文件的模式必须是 "rb+"，因为 "wb+" 会清空文件，"ab+" 则是向文件追加（fseek() 也无效）
-        FILE *fp = fopen(this->logFilePath_.c_str(), "rb+");
+        FILE *fp = fopen(this->log_file_path_.c_str(), "rb+");
 
         if (fp == nullptr) {
             if (DEBUG) {
                 tool::PrintLog(LogLevel::Debug, TAG, LOG_THREAD_NAME,
                                ">>> 打开日志文件 %s 失败（内存缓存）！errno = %d",
-                               this->logFilePath_.c_str(), errno);
+                               this->log_file_path_.c_str(), errno);
             }
             return false;
         }
 
         // 内存缓存满，将缓存数据写入文件
-        fseek(fp, this->logLengthOffset_, SEEK_SET);
+        fseek(fp, this->log_length_offset_, SEEK_SET);
 
-        int isOk = fprintf(fp, "%s", this->logMemAddr_);
+        int is_ok = fprintf(fp, "%s", this->log_mem_addr_);
 
-        if (isOk == EOF) {
+        if (is_ok == EOF) {
             if (DEBUG) {
                 tool::PrintLog(LogLevel::Debug, TAG, LOG_THREAD_NAME,
-                               ">>> 写入日志数据到文件 %s 失败（内存缓存）！", this->logFilePath_.c_str());
+                               ">>> 写入日志数据到文件 %s 失败（内存缓存）！", this->log_file_path_.c_str());
             }
             fclose(fp);
             return false;
@@ -446,11 +445,11 @@ bool LogMmap::WriteLogToFileInMem(const std::shared_ptr<LogData> &logData) {
         fclose(fp);
 
         // 更新有效日志的长度
-        this->logLengthOffset_ += this->memBufSize_;
+        this->log_length_offset_ += this->mem_buf_size_;
 
         // 清空内存缓存
-        memset(this->logMemAddr_, 0, LOG_MEMORY_LEN);
-        this->memBufSize_ = 0;
+        memset(this->log_mem_addr_, 0, LOG_MEMORY_LEN);
+        this->mem_buf_size_ = 0;
 
         return true;
 
@@ -459,87 +458,87 @@ bool LogMmap::WriteLogToFileInMem(const std::shared_ptr<LogData> &logData) {
     if (DEBUG) {
         tool::PrintLog(LogLevel::Info, TAG, LOG_THREAD_NAME,
                        ">>> (MEM)当前日志文件 %s 已满，需要创建新的日志文件",
-                       this->logFilePath_.c_str());
+                       this->log_file_path_.c_str());
     }
 
     // 删除历史日志文件
-    int deleteFileNums = this->logStorageHelper_->DeleteOldestLogFile();
+    int delete_file_nums = this->log_storage_helper_->DeleteOldestLogFile();
 
     if (DEBUG) {
         tool::PrintLog(LogLevel::Info, TAG, LOG_THREAD_NAME,
-                       ">>> 删除历史日志文件 %d 个", deleteFileNums);
+                       ">>> 删除历史日志文件 %d 个", delete_file_nums);
     }
 
     // 重命名当前日志文件
-    this->logStorageHelper_->RenameLogFile();
+    this->log_storage_helper_->RenameLogFile();
 
     // 标识日志待写入的文件位置
-    long logOffset = 0;
+    long log_offset = 0;
 
     // 创建新日志文件，并写入当前日志
-    LogFileStatus status = this->logStorageHelper_->PrepareLogFile(this->logFilePath_.c_str(), logOffset);
+    LogFileStatus status = this->log_storage_helper_->PrepareLogFile(this->log_file_path_.c_str(), log_offset);
 
     if (status == LogFileStatus::FAILED) {
         // 日志文件打开失败
         if (DEBUG) {
             tool::PrintLog(LogLevel::Error, TAG, LOG_THREAD_NAME,
-                           ">>> 打开日志文件 %s 失败", this->logFilePath_.c_str());
+                           ">>> 打开日志文件 %s 失败", this->log_file_path_.c_str());
         }
         return false;
     }
 
-    this->logLengthOffset_ = logOffset;
+    this->log_length_offset_ = log_offset;
 
     // 清空内存缓存
-    memset(this->logMemAddr_, 0, LOG_MEMORY_LEN);
+    memset(this->log_mem_addr_, 0, LOG_MEMORY_LEN);
 
     // 重置相关参数
-    this->memBufSize_ = 0;
+    this->mem_buf_size_ = 0;
 
     // 将当前日志数据拷贝至内存缓存中
-    this->FlushLogToMem(logData);
+    this->FlushLogToMem(log_data);
 
     return true;
 }
 
-bool LogMmap::FlushLogToMmap(const std::shared_ptr<LogData> &logData, bool bSync) {
+bool LogMmap::FlushLogToMmap(const std::shared_ptr<LogData> &log_data, bool sync) {
 
     // 判断是否超出 Mmap 映射长度
-    if (this->logLengthOffset_ + logData->GetLog().size() > LOG_MMAP_LEN) {
+    if (this->log_length_offset_ + log_data->GetLog().size() > LOG_MMAP_LEN) {
         return false;
     }
 
     // 写入mmap缓存，一段时间后会自动写回磁盘，如果想立即写回磁盘需要调用 msync()
-    memcpy(this->logMmapAddr_ + this->logLengthOffset_, logData->GetLog().c_str(),
-           logData->GetLog().size());
+    memcpy(this->log_mmap_addr_ + this->log_length_offset_, log_data->GetLog().c_str(),
+           log_data->GetLog().size());
 
-    this->logLengthOffset_ += static_cast<long>(logData->GetLog().size());
+    this->log_length_offset_ += static_cast<long>(log_data->GetLog().size());
 
     // 是否立即同步数据到磁盘，一般无需立即同步
-    if (bSync) {
+    if (sync) {
         this->Msync(false);
     }
 
     return true;
 }
 
-bool LogMmap::FlushLogToMem(const std::shared_ptr<LogData> &logData) {
+bool LogMmap::FlushLogToMem(const std::shared_ptr<LogData> &log_data) {
 
     // 判断是否超出内存缓存长度
-    if (this->memBufSize_ + logData->GetLog().size() > LOG_MEMORY_LEN) {
+    if (this->mem_buf_size_ + log_data->GetLog().size() > LOG_MEMORY_LEN) {
         return false;
     }
 
     // 保存到内存中
-    memcpy(this->logMemAddr_ + this->memBufSize_, logData->GetLog().c_str(),
-           logData->GetLog().size());
+    memcpy(this->log_mem_addr_ + this->mem_buf_size_, log_data->GetLog().c_str(),
+           log_data->GetLog().size());
 
-    this->memBufSize_ += static_cast<long>(logData->GetLog().size());
+    this->mem_buf_size_ += static_cast<long>(log_data->GetLog().size());
     return true;
 }
 
 LogStrategy LogMmap::GetLogStrategy() const {
-    return this->logStrategy_;
+    return this->log_strategy_;
 }
 
 }  // namespace log

@@ -26,10 +26,10 @@ public: /* Methods                                         */
 
     /**
      * 对日志进行加密
-     * @param inputLog  加密前日志
-     * @param outputLog 加密后日志
+     * @param input_log  加密前日志
+     * @param output_log 加密后日志
      */
-    static void EncryptLog(const std::string &inputLog, std::string &outputLog);
+    static void EncryptLog(const std::string &input_log, std::string &output_log);
 
 private:
 

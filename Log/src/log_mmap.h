@@ -10,6 +10,7 @@
  * 系统头文件
  */
 #include <iostream>
+#include <memory>
 
 /**
  * 自定义头文件
@@ -31,9 +32,9 @@ public: /* Methods                                         */
 
     /**
      *
-     * @param logFileDir 日志目录
+     * @param log_file_dir 日志目录
      */
-    explicit LogMmap(const std::string &logFileDir);
+    explicit LogMmap(const std::string &log_file_dir);
 
     /**
      * 虚析构函数
@@ -42,16 +43,16 @@ public: /* Methods                                         */
 
     /**
      * 禁用拷贝构造
-     * @param mmapImpl
+     * @param mmap_impl
      */
-    LogMmap(const LogMmap &mmapImpl) = delete;
+    LogMmap(const LogMmap &mmap_impl) = delete;
 
     /**
      * 禁用赋值构造
-     * @param mmapImpl
+     * @param mmap_impl
      * @return
      */
-    LogMmap &operator=(const LogMmap &mmapImpl) = delete;
+    LogMmap &operator=(const LogMmap &mmap_impl) = delete;
 
 public:
 
@@ -63,38 +64,38 @@ public:
 
     /**
      * 以 Mmap 策略将日志数据写入文件
-     * @param logData 日志数据
-     * @param bSync   是否立即同步 Mmap 缓存数据到磁盘。
+     * @param log_data 日志数据
+     * @param sync   是否立即同步 Mmap 缓存数据到磁盘。
      *                一般无需立即同步，Mmap 一段时间之后会自动同步
      *                true : 立即同步
      *                false: 不同步
      * @return
      */
-    bool WriteLogToFileInMmap(const std::shared_ptr<LogData> &logData, bool bSync = false);
+    bool WriteLogToFileInMmap(const std::shared_ptr<LogData> &log_data, bool sync = false);
 
     /**
      * 以内存缓存策略将日志数据写入文件
-     * @param logData
+     * @param log_data
      */
-    bool WriteLogToFileInMem(const std::shared_ptr<LogData> &logData);
+    bool WriteLogToFileInMem(const std::shared_ptr<LogData> &log_data);
 
     /**
      * 将日志刷新到 Mmap 缓存
-     * @param logData 日志数据
-     * @param bSync   是否立即同步mmap缓存数据到磁盘。
+     * @param log_data 日志数据
+     * @param sync   是否立即同步mmap缓存数据到磁盘。
      *                一般无需立即同步，Mmap 一段时间之后会自动同步
      *                true : 立即同步
      *                false: 不同步
      * @return
      */
-    bool FlushLogToMmap(const std::shared_ptr<LogData> &logData, bool bSync);
+    bool FlushLogToMmap(const std::shared_ptr<LogData> &log_data, bool sync);
 
     /**
      * 将日志数据刷新到内存缓存
-     * @param logData 日志数据
+     * @param log_data 日志数据
      * @return
      */
-    bool FlushLogToMem(const std::shared_ptr<LogData> &logData);
+    bool FlushLogToMem(const std::shared_ptr<LogData> &log_data);
 
 private:
 
@@ -102,7 +103,7 @@ private:
      * mmap映射
      * @param file 待映射的文件名
      */
-    bool Mmap(const char *filePath) override;
+    bool Mmap(const char *file_path) override;
 
     /**
      * mmap映射
@@ -122,10 +123,10 @@ private:
     /**
      * 将日志数据立即同步到磁盘中
      * @param logData 日志数据
-     * @param bSync   true:  同步写回
-     *                false: 异步写回
+     * @param sync   true :  同步写回
+     *               false: 异步写回
      */
-    void Msync(bool bSync) override;
+    void Msync(bool sync) override;
 
 /* ======================================================= */
 private: /* Fields                                         */
@@ -134,37 +135,37 @@ private: /* Fields                                         */
     /**
      * 日志文件名（绝对路径）
      */
-    const std::string logFilePath_;
+    const std::string log_file_path_;
 
     /**
      * 如果mmap映射成功，该值表示映射到进程空间的地址
      */
-    char *logMmapAddr_;
+    char *log_mmap_addr_;
 
     /**
      * 如果内存缓存创建成功，该值表示内存缓存的地址
      */
-    char *logMemAddr_;
+    char *log_mem_addr_;
 
     /**
      * 日志文件中有效日志数据的长度
      */
-    long logLengthOffset_;
+    long log_length_offset_;
 
     /**
      * 如果是内存缓存映射，该值表示当前内存缓冲区大小
      */
-    long memBufSize_;
+    long mem_buf_size_;
 
     /**
      * 日志存储策略
      */
-    LogStrategy logStrategy_;
+    LogStrategy log_strategy_;
 
     /**
      * 日志存储器，进行具体的日志文件相关操作
      */
-    std::shared_ptr<LogStorageHelper> logStorageHelper_;
+    std::shared_ptr<LogStorageHelper> log_storage_helper_;
 };
 
 }  // namespace log

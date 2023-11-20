@@ -55,17 +55,17 @@ std::string GetLogTypeName(LogType type);
 
 /**
  * 判断文件是否存在
- * @param filePath 文件名，绝对路径
+ * @param filepath 文件名，绝对路径
  * @return
  */
-bool IsFileExist(const char *const &filePath);
+bool IsFileExist(const char *const &filepath);
 
 /**
  * 获取文件长度
- * @param filePath 文件名，绝对路径
+ * @param filepath 文件名，绝对路径
  * @return
  */
-long GetFileSize(const char *const &filePath);
+long GetFileSize(const char *const &filepath);
 
 /**
  * 创建目录

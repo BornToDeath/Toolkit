@@ -33,29 +33,29 @@ unsigned long long CurrentTimeMills() {
 void PrintLog(LogLevel level, const char *tag, const char *format, ...) {
 
     // 获取线程名
-    char threadName[THREAD_NAME_MAX_LEN] = {0};
-    prctl(PR_GET_NAME, threadName);
+    char thread_name[THREAD_NAME_MAX_LEN] = {0};
+    prctl(PR_GET_NAME, thread_name);
 
     // 日志内容
-    char logText[LOG_TEXT_MAX_LEN] = {0};
+    char log_text[LOG_TEXT_MAX_LEN] = {0};
 
     va_list arg_list;
     va_start(arg_list, format);
-    vsnprintf(logText, LOG_TEXT_MAX_LEN, format, arg_list);
+    vsnprintf(log_text, LOG_TEXT_MAX_LEN, format, arg_list);
     va_end(arg_list);
 
     // 日志级别
-    const char *logLevel = logLevelName[static_cast<int>(level)];
+    const char *log_level = logLevelName[static_cast<int>(level)];
 
     // 当前时间
     std::string now = GetCurrentDateTime("%Y-%m-%d %H:%M:%S");
 
     std::ostringstream oss;
     oss << now
-        << " | " << logLevel
+        << " | " << log_level
         << " | " << tag
-        << " | " << threadName
-        << " | " << logText;
+        << " | " << thread_name
+        << " | " << log_text;
 
     std::string log = oss.str();
     switch (level) {
@@ -99,22 +99,22 @@ std::string GetLogTypeName(LogType type) {
     }
 }
 
-bool IsFileExist(const char *const &filePath) {
-    return 0 == access(filePath, F_OK);
+bool IsFileExist(const char *const &filepath) {
+    return 0 == access(filepath, F_OK);
 }
 
-long GetFileSize(const char *const &filePath) {
+long GetFileSize(const char *const &filepath) {
 
-    FILE *fp = fopen(filePath, "rb");
+    FILE *fp = fopen(filepath, "rb");
     if (fp == nullptr) {
         return -1;
     }
 
     fseek(fp, 0, SEEK_END);
-    long fileSize = ftell(fp);
+    long file_size = ftell(fp);
     fclose(fp);
 
-    return fileSize;
+    return file_size;
 }
 
 bool CreateDirIfNotExist(const char *const &dir) {
@@ -197,12 +197,12 @@ std::string GetCurrentDateTime(const char *const format) {
          */
 
         auto now = std::chrono::system_clock::now();
-        auto curTime = std::chrono::system_clock::to_time_t(now);
+        auto cur_time = std::chrono::system_clock::to_time_t(now);
 
         // 日期
         const int size = 64;
         char buf[size] = {0};
-        strftime(buf, size, format, std::localtime(&curTime));
+        strftime(buf, size, format, std::localtime(&cur_time));
 
         // 毫秒
         auto mills = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000;

@@ -29,9 +29,9 @@ Logger &Logger::Singleton() {
     return logger;
 }
 
-bool Logger::Init(const std::string &logDir) {
-    isQuit_ = false;
-    logRootDir_ = logDir;
+bool Logger::Init(const std::string &log_dir) {
+    is_quit_ = false;
+    log_root_dir_ = log_dir;
 
     // 写日志
     auto runnable = [this]() {
@@ -39,50 +39,50 @@ bool Logger::Init(const std::string &logDir) {
         prctl(PR_SET_NAME, LOG_THREAD_NAME);
 
         if (DEBUG) {
-            char threadName[THREAD_NAME_MAX_LEN] = {0};
-            prctl(PR_GET_NAME, threadName);
+            char thread_name[THREAD_NAME_MAX_LEN] = {0};
+            prctl(PR_GET_NAME, thread_name);
             tool::PrintLog(LogLevel::Debug, TAG, LOG_THREAD_NAME,
                            ">>> 启动日志存储子线程, 线程名: %s , 线程 ID: %ld",
-                           threadName, std::this_thread::get_id());
+                           thread_name, std::this_thread::get_id());
         }
 
         // 死循环处理日志
-        while (!isQuit_) {
-            std::shared_ptr<LogData> logData = nullptr;
+        while (!is_quit_) {
+            std::shared_ptr<LogData> log_data = nullptr;
 
             // 消费者
             {
-                std::unique_lock<std::mutex> lock(logMutex_);
+                std::unique_lock<std::mutex> lock(log_mutex_);
 
                 // 线程阻塞，直到日志队列不为空
-                logConsumeCondition_.wait(lock, [this]() {
-                    if (!this->logQueue_.empty() || isQuit_) {
+                log_consume_condition_.wait(lock, [this]() {
+                    if (!this->log_queue_.empty() || is_quit_) {
                         return true;
                     }
                     return false;
                 });
 
                 // 是否退出循环
-                if (isQuit_) {
+                if (is_quit_) {
                     break;
                 }
 
                 // 取日志队列中的头数据
-                logData = this->logQueue_.front();
-                this->logQueue_.pop();
+                log_data = this->log_queue_.front();
+                this->log_queue_.pop();
             }
 
             // 处理日志，将日志写入文件
-            this->WriteLog(logData);
+            this->WriteLog(log_data);
         }
 
         // 将队列中剩余日志处理完
-        while (!this->logQueue_.empty()) {
+        while (!this->log_queue_.empty()) {
             std::shared_ptr<LogData> log = nullptr;
             {
-                std::unique_lock<std::mutex> lock(logMutex_);
-                log = this->logQueue_.front();
-                this->logQueue_.pop();
+                std::unique_lock<std::mutex> lock(log_mutex_);
+                log = this->log_queue_.front();
+                this->log_queue_.pop();
             }
             this->WriteLog(log);
         }
@@ -91,31 +91,31 @@ bool Logger::Init(const std::string &logDir) {
             tool::PrintLog(LogLevel::Info, TAG, ">>> 日志线程退出!");
         }
     };
-    logThread_ = std::unique_ptr<std::thread>(new std::thread(runnable));
+    log_thread_ = std::unique_ptr<std::thread>(new std::thread(runnable));
     return true;
 }
 
 void Logger::Stop() {
-    if (isQuit_) {
+    if (is_quit_) {
         return;
     }
-    isQuit_ = true;
-    logConsumeCondition_.notify_all();
-    if (logThread_) {
-        logThread_->join();
+    is_quit_ = true;
+    log_consume_condition_.notify_all();
+    if (log_thread_) {
+        log_thread_->join();
     }
 }
 
 void Logger::WriteLog(LogType type, LogLevel level, const char *tag, const char *log) {
 
     // 退出日志线程时不再处理日志
-    if (isQuit_) {
+    if (is_quit_) {
         return;
     }
 
     // 获取线程名
-    char threadName[THREAD_NAME_MAX_LEN] = {0};
-    prctl(PR_GET_NAME, threadName);
+    char thread_name[THREAD_NAME_MAX_LEN] = {0};
+    prctl(PR_GET_NAME, thread_name);
 
     // 当前时间
     std::string now = tool::GetCurrentDateTime("%Y-%m-%d %H:%M:%S");
@@ -124,7 +124,7 @@ void Logger::WriteLog(LogType type, LogLevel level, const char *tag, const char 
     oss << now << " | "
         << logLevelName[static_cast<int>(level)] << " | "
         << tag << " | "
-        << threadName << " | "
+        << thread_name << " | "
         << log;
 
     /**
@@ -132,56 +132,56 @@ void Logger::WriteLog(LogType type, LogLevel level, const char *tag, const char 
      */
 
     // 构造日志数据结构
-    auto logData = std::make_shared<LogData>(type, level, tag, oss.str());
+    auto log_data = std::make_shared<LogData>(type, level, tag, oss.str());
 
     // 生产者
     {
         // 加锁，保证线程安全
-        std::unique_lock<std::mutex> lock(logMutex_);
+        std::unique_lock<std::mutex> lock(log_mutex_);
 
         // 加入到日志队列中
-        this->logQueue_.push(logData);
+        this->log_queue_.push(log_data);
 
         // 通知日志处理线程开始处理日志
-        logConsumeCondition_.notify_all();
+        log_consume_condition_.notify_all();
     }
 }
 
-bool Logger::WriteLog(const std::shared_ptr<LogData> &logData) {
+bool Logger::WriteLog(const std::shared_ptr<LogData> &log_data) {
 
-    if (!logData) {
+    if (!log_data) {
         return true;
     }
 
-    std::string encryptedLogText;
+    std::string encrypted_log_text;
 
     // 日志加密
-    LogEncryptor::EncryptLog(logData->GetLog(), encryptedLogText);
+    LogEncryptor::EncryptLog(log_data->GetLog(), encrypted_log_text);
 
-    encryptedLogText.append("\n");
-    logData->SetLog(encryptedLogText);
+    encrypted_log_text.append("\n");
+    log_data->SetLog(encrypted_log_text);
 
     // 如果 map 中没有对应日志类型的日志存储器，则创建对应的日志存储器并记录到 map 中
-    if (this->logContainer_.find(logData->GetType()) == this->logContainer_.end()) {
+    if (this->log_container_.find(log_data->GetType()) == this->log_container_.end()) {
 
-        std::string logDir = logRootDir_ + tool::GetLogTypeName(logData->GetType()) + "/";
+        std::string log_dir = log_root_dir_ + tool::GetLogTypeName(log_data->GetType()) + "/";
 
-        if (!tool::CreateDirIfNotExist(logDir.c_str())) {
+        if (!tool::CreateDirIfNotExist(log_dir.c_str())) {
             if (DEBUG) {
                 tool::PrintLog(LogLevel::Error, TAG, LOG_THREAD_NAME,
                                ">>> 创建日志目录 %s 失败，errno = %d",
-                               logDir.c_str(), errno);
+                               log_dir.c_str(), errno);
             }
 //            Log::setIsInit(false);  // 无需调用此方法，因为如果设置为 false ，则其他类型的日志也无法存储
             return false;
         }
 
         // 创建 model 并将 model 添加到 map 中
-        auto model = std::make_shared<LogModel>(logDir);
-        this->logContainer_.insert(std::make_pair(logData->GetType(), model));
+        auto model = std::make_shared<LogModel>(log_dir);
+        this->log_container_.insert(std::make_pair(log_data->GetType(), model));
     }
 
-    bool isOk = this->logContainer_[logData->GetType()]->WriteLogToFile(logData);
+    bool isOk = this->log_container_[log_data->GetType()]->WriteLogToFile(log_data);
     return isOk;
 }
 

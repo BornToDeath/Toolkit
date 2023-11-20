@@ -12,6 +12,7 @@
 #include <condition_variable>
 #include <map>
 #include <mutex>
+#include <queue>
 #include <thread>
 
 /**
@@ -68,7 +69,7 @@ public: /* Methods                                         */
      * 设置日志根目录
      * @param dir
      */
-    bool Init(const std::string &logDir);
+    bool Init(const std::string &log_dir);
 
     /**
      * 停止写日志
@@ -90,10 +91,10 @@ private:
 
     /**
      * 将单条日志写入文件
-     * @param logData
+     * @param log_data
      * @return
      */
-    bool WriteLog(const std::shared_ptr<LogData> &logData);
+    bool WriteLog(const std::shared_ptr<LogData> &log_data);
 
 
 /* ======================================================= */
@@ -103,35 +104,35 @@ private: /* Fields                                         */
     /**
      * 日志根目录
      */
-    std::string logRootDir_;
+    std::string log_root_dir_;
 
     /**
      * 锁
      */
-    std::mutex logMutex_;
+    std::mutex log_mutex_;
 
     /**
      * 日志处理的条件变量，作为一种同步机制
      */
-    std::condition_variable logConsumeCondition_;
+    std::condition_variable log_consume_condition_;
 
     /**
      * 日志队列。用于存放待存储的日志数据
      */
-    std::queue<std::shared_ptr<LogData>> logQueue_;
+    std::queue<std::shared_ptr<LogData>> log_queue_;
 
     /**
      * 容器，存放不同类型的日志存储器
      */
-    std::map<LogType, std::shared_ptr<LogModel>> logContainer_;
+    std::map<LogType, std::shared_ptr<LogModel>> log_container_;
 
     /**
      * 日志线程是否退出的标志
      */
-    bool isQuit_{true};
+    bool is_quit_{true};
 
     // 写日志线程
-    std::unique_ptr<std::thread> logThread_;
+    std::unique_ptr<std::thread> log_thread_;
 };
 
 }  // namespace log

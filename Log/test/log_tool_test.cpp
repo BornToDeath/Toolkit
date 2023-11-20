@@ -58,50 +58,50 @@ TEST(LogToolTest, GetLogTypeName) {
 
 TEST(LogToolTest, IsFileExist) {
     const std::string dir = "/home/Tookit/Log/test/";
-    const std::string filePath1 = dir + "unit_test.sh";
-    auto res = tool::IsFileExist(filePath1.c_str());
+    const std::string filepath1 = dir + "unit_test.sh";
+    auto res = tool::IsFileExist(filepath1.c_str());
     EXPECT_TRUE(res);
 
-    const std::string filePath2 = dir + "aaa";
-    ::remove(filePath2.c_str());
-    res = tool::IsFileExist(filePath2.c_str());
+    const std::string filepath2 = dir + "aaa";
+    ::remove(filepath2.c_str());
+    res = tool::IsFileExist(filepath2.c_str());
     EXPECT_FALSE(res);
 }
 
 TEST(LogToolTest, GetFileSize) {
     const std::string dir = "/home/Tookit/Log/test/";
-    const std::string filePath1 = dir + "unit_test.sh";
-    auto size = tool::GetFileSize(filePath1.c_str());
+    const std::string filepath1 = dir + "unit_test.sh";
+    auto size = tool::GetFileSize(filepath1.c_str());
     EXPECT_GT(size, 0);
     EXPECT_NE(size, -1);
 
-    const std::string filePath2 = dir + "aaa";
-    ::remove(filePath2.c_str());
-    size = tool::GetFileSize(filePath2.c_str());
+    const std::string filepath2 = dir + "aaa";
+    ::remove(filepath2.c_str());
+    size = tool::GetFileSize(filepath2.c_str());
     EXPECT_EQ(size, -1);
 }
 
 TEST(LogToolTest, CreateDirIfNotExist) {
-    const std::string rootDir = "/home/Tookit/Log/test/";
+    const std::string root_dir = "/home/Tookit/Log/test/";
     auto res = tool::CreateDirIfNotExist(nullptr);
     EXPECT_FALSE(res);
 
-    const std::string dir1 = rootDir + "build";
+    const std::string dir1 = root_dir + "build";
     res = tool::CreateDirIfNotExist(dir1.c_str());
     EXPECT_TRUE(res);
 
-    const std::string dir2 = rootDir + "aaa";
+    const std::string dir2 = root_dir + "aaa";
     ::remove(dir2.c_str());
     res = tool::CreateDirIfNotExist(dir2.c_str());
     EXPECT_TRUE(res);
 }
 
 TEST(LogToolTest, CreateMultiLevelDir) {
-    const std::string rootDir = "/home/Tookit/Log/test/build/";
+    const std::string root_dir = "/home/Tookit/Log/test/build/";
     auto res = tool::CreateMultiLevelDir(nullptr);
     EXPECT_FALSE(res);
 
-    const std::string dir1 = rootDir + "a/b/c/d";
+    const std::string dir1 = root_dir + "a/b/c/d";
     res = tool::CreateMultiLevelDir(dir1.c_str());
     EXPECT_TRUE(res);
 

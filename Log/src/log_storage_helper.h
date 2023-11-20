@@ -32,9 +32,9 @@ public: /* Methods                                         */
 
     /**
      *
-     * @param logFileDir 日志目录
+     * @param log_file_dir 日志目录
      */
-    explicit LogStorageHelper(std::string logFileDir);
+    explicit LogStorageHelper(std::string log_file_dir);
 
     /**
      * 析构函数
@@ -43,26 +43,26 @@ public: /* Methods                                         */
 
     /**
      * 禁用拷贝构造
-     * @param logStorageHelper
+     * @param log_storage_helper
      */
-    LogStorageHelper(const LogStorageHelper &logStorageHelper) = delete;
+    LogStorageHelper(const LogStorageHelper &log_storage_helper) = delete;
 
     /**
      * 禁用赋值构造
-     * @param logStorageHelper
+     * @param log_storage_helper
      * @return
      */
-    LogStorageHelper &operator=(const LogStorageHelper &logStorageHelper) = delete;
+    LogStorageHelper &operator=(const LogStorageHelper &log_storage_helper) = delete;
 
 public:
 
     /**
      * 准备日志文件，为 Mmap 映射做准备
-     * @param filePath  日志文件名。绝对路径
-     * @param logOffset 如果文件可用，则标识日志待写入的文件位置
+     * @param file_path  日志文件名。绝对路径
+     * @param log_offset 如果文件可用，则标识日志待写入的文件位置
      * @return
      */
-    LogFileStatus PrepareLogFile(const char *filePath, long &logOffset);
+    LogFileStatus PrepareLogFile(const char *file_path, long &log_offset);
 
     /**
      * 重命名日志文件
@@ -122,22 +122,22 @@ private: /* Fields                                         */
     /**
      * 日志目录
      */
-    const std::string logFileDir_;
+    const std::string log_file_dir_;
 
     /**
      * 历史日志文件名最大索引
      */
-    long logFileMaxIndex_;
+    long log_file_max_index_;
 
     /**
      * 历史日志文件名最小索引
      */
-    long logFileMinIndex_;
+    long log_file_min_index_;
 
     /**
      * 当前历史日志文件的个数
      */
-    long logFileNums_;
+    long log_file_nums_;
 
 };
 

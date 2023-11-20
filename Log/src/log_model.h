@@ -18,7 +18,7 @@ class LogModel final {
 
 public:
 
-    explicit LogModel(const std::string &logFileDir);
+    explicit LogModel(const std::string &log_file_dir);
 
     ~LogModel() = default;
 
@@ -39,17 +39,17 @@ public:
 
     /**
      * 将单条日志写入文件
-     * @param logData
+     * @param log_data
      * @return
      */
-    bool WriteLogToFile(const std::shared_ptr<LogData> &logData);
+    bool WriteLogToFile(const std::shared_ptr<LogData> &log_data);
 
 private:
 
     /**
      * Mmap 实现对象。进行 Mmap 映射等操作
      */
-    std::shared_ptr<LogMmap> mmapImpl_;
+    std::shared_ptr<LogMmap> mmap_impl_;
 };
 
 }  // namespace log

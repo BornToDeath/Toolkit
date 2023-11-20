@@ -31,17 +31,17 @@
 
 namespace log {
 
-LogStorageHelper::LogStorageHelper(std::string logFileDir) :
-        logFileDir_(std::move(logFileDir)),
-        logFileMinIndex_(LONG_MAX),
-        logFileMaxIndex_(-1),
-        logFileNums_(0) {
+LogStorageHelper::LogStorageHelper(std::string log_file_dir) :
+        log_file_dir_(std::move(log_file_dir)),
+        log_file_min_index_(LONG_MAX),
+        log_file_max_index_(-1),
+        log_file_nums_(0) {
 
 }
 
-LogFileStatus LogStorageHelper::PrepareLogFile(const char *const filePath, long &logOffset) {
+LogFileStatus LogStorageHelper::PrepareLogFile(const char *const file_path, long &log_offset) {
 
-    if (filePath == nullptr || strlen(filePath) == 0) {
+    if (file_path == nullptr || strlen(file_path) == 0) {
         tool::PrintLog(LogLevel::Error, TAG, LOG_THREAD_NAME, ">>> 日志文件为空！");
         return LogFileStatus::FAILED;
     }
@@ -53,24 +53,24 @@ LogFileStatus LogStorageHelper::PrepareLogFile(const char *const filePath, long 
 
     // 注意，打开文件的模式必须是 "rb+"，因为 "wb+" 会清空文件，"ab+" 则是
     // 向文件追加（fseek() 也无效）。但 "rb+" 必须打开一个已存在的文件，否则出错
-    FILE *file = fopen(filePath, "rb+");
+    FILE *file = fopen(file_path, "rb+");
 
     if (nullptr == file) {
 
         // 如果文件不存在，创建文件
         if (errno == 2) {
-            file = fopen(filePath, "wb+");
+            file = fopen(file_path, "wb+");
             if (file == nullptr) {
                 tool::PrintLog(LogLevel::Error, TAG, LOG_THREAD_NAME,
-                               ">>> 创建日志文件 %s 失败，errno = %d", filePath, errno);
+                               ">>> 创建日志文件 %s 失败，errno = %d", file_path, errno);
                 return LogFileStatus::FAILED;
             }
             tool::PrintLog(LogLevel::Debug, TAG, LOG_THREAD_NAME,
-                           ">>> 创建新的日志文件：%s", filePath);
+                           ">>> 创建新的日志文件：%s", file_path);
         } else {
             if (DEBUG) {
                 tool::PrintLog(LogLevel::Error, TAG, LOG_THREAD_NAME,
-                               ">>> 打开日志文件 %s 失败，errno = %d", filePath, errno);
+                               ">>> 打开日志文件 %s 失败，errno = %d", file_path, errno);
             }
             return LogFileStatus::FAILED;
         }
@@ -87,11 +87,11 @@ LogFileStatus LogStorageHelper::PrepareLogFile(const char *const filePath, long 
     fseek(file, 0, SEEK_END);
 
     // 得到文件指针的当前位置相对于文件首的偏移量。此处是获取文件的大小
-    long fileSize = ftell(file);
+    long file_size = ftell(file);
 
     if (DEBUG) {
         tool::PrintLog(LogLevel::Debug, TAG, LOG_THREAD_NAME,
-                       ">>> 日志文件 %s 的大小为：%ld 字节", filePath, fileSize);
+                       ">>> 日志文件 %s 的大小为：%ld 字节", file_path, file_size);
     }
 
     /**
@@ -99,11 +99,11 @@ LogFileStatus LogStorageHelper::PrepareLogFile(const char *const filePath, long 
      * 目的是：防止磁盘上的脏数据影响到文件内容
      */
 
-    if (fileSize == 0) {
+    if (file_size == 0) {
         // 说明是新创建的日志文件。不管是mmap还是内存缓存，都会走此流程，意味着：日志文件在创建时都会被填充0
 
         // 更新日志长度
-        logOffset = 0;
+        log_offset = 0;
 
         // 移动文件指针到文件头
         fseek(file, 0, SEEK_SET);
@@ -114,19 +114,19 @@ LogFileStatus LogStorageHelper::PrepareLogFile(const char *const filePath, long 
          * 分多次写 0，原因是：尽可能少的申请栈空间，避免出现问题
          */
 
-        constexpr int flushTimes = 4;
-        constexpr int flushSizePerTime = LOG_MMAP_LEN / flushTimes;
+        constexpr int kFlushTimes = 4;
+        constexpr int kFlushSizePerTime = LOG_MMAP_LEN / kFlushTimes;
 
         // 不要在栈上申请空间，否则可能会导致栈溢出！
-        char *zeroData = new char[flushSizePerTime];
-        memset(zeroData, 0, flushSizePerTime);
+        char *zero_data_buf = new char[kFlushSizePerTime];
+        memset(zero_data_buf, 0, kFlushSizePerTime);
 
-        for (int i = 0; i < flushTimes; ++i) {
+        for (int i = 0; i < kFlushTimes; ++i) {
             // fwrite()之后会自动偏移文件指针
-            fwrite(zeroData, flushSizePerTime, 1, file);
+            fwrite(zero_data_buf, kFlushSizePerTime, 1, file);
         }
 
-        delete[] zeroData;
+        delete[] zero_data_buf;
 
         // 将用户进程缓冲区中的数据刷新到内核缓冲区
         fflush(file);
@@ -143,13 +143,13 @@ LogFileStatus LogStorageHelper::PrepareLogFile(const char *const filePath, long 
                            LOG_MMAP_LEN, t2 - t1);
         }
 
-    } else if (fileSize < LOG_MMAP_LEN) {
+    } else if (file_size < LOG_MMAP_LEN) {
         // 说明日志文件长度不够，需要用 0 填充
 
         if (DEBUG) {
             tool::PrintLog(LogLevel::Debug, TAG, LOG_THREAD_NAME,
                            ">>> 已存在的未填充的日志文件：%s，文件长度为：%ld Byte，需要用 0 填充至指定长度 %ld",
-                           filePath, fileSize, LOG_MMAP_LEN);
+                           file_path, file_size, LOG_MMAP_LEN);
         }
 
         /**
@@ -159,7 +159,7 @@ LogFileStatus LogStorageHelper::PrepareLogFile(const char *const filePath, long 
         long index = this->GetLocationToBeWritten(file);
 
         // 更新日志长度
-        logOffset = index;
+        log_offset = index;
 
         /**
          * 向文件填充 0
@@ -168,13 +168,13 @@ LogFileStatus LogStorageHelper::PrepareLogFile(const char *const filePath, long 
         fseek(file, 1, SEEK_END);
 
         // 需要填充的长度
-        long needFilledLen = static_cast<long>(LOG_MMAP_LEN) - fileSize;
+        long need_filled_len = static_cast<long>(LOG_MMAP_LEN) - file_size;
 
         // 不要在栈上申请空间，否则可能会导致栈溢出！
-        char *buf = new char[needFilledLen];
-        memset(buf, 0, needFilledLen);
+        char *buf = new char[need_filled_len];
+        memset(buf, 0, need_filled_len);
 
-        fwrite(buf, needFilledLen, 1, file);
+        fwrite(buf, need_filled_len, 1, file);
         fflush(file);
         fsync(fileno(file));
 
@@ -185,7 +185,7 @@ LogFileStatus LogStorageHelper::PrepareLogFile(const char *const filePath, long 
         if (DEBUG) {
             tool::PrintLog(LogLevel::Debug, TAG, LOG_THREAD_NAME,
                            ">>> 已存在的已填充的日志文件：%s，文件长度为：%ld Byte",
-                           filePath, fileSize);
+                           file_path, file_size);
         }
 
         // 获取待写入的文件位置
@@ -195,13 +195,13 @@ LogFileStatus LogStorageHelper::PrepareLogFile(const char *const filePath, long 
             // 说明当前日志文件恰好已满
             if (DEBUG) {
                 tool::PrintLog(LogLevel::Debug, TAG, LOG_THREAD_NAME,
-                               ">>> 当前日志文件已满：%s", filePath);
+                               ">>> 当前日志文件已满：%s", file_path);
             }
             return LogFileStatus::FULL;
         }
 
         // 更新日志长度
-        logOffset = index;
+        log_offset = index;
     }
 
     fclose(file);
@@ -211,41 +211,41 @@ LogFileStatus LogStorageHelper::PrepareLogFile(const char *const filePath, long 
 
 bool LogStorageHelper::RenameLogFile() {
 
-    std::string curLogFileName = this->logFileDir_ + LOG_CUR_FILE_NAME LOG_FILE_SUF;
+    std::string cur_log_filename = this->log_file_dir_ + LOG_CUR_FILE_NAME LOG_FILE_SUF;
 
     this->UpdateLogFileParams();
 
     // 文件索引。设置字段宽度为3，不足补0
-    long curFileMaxIndex = this->logFileMaxIndex_ + 1;
-    std::ostringstream indexOss;
-    indexOss << std::setw(3) << std::setfill('0') << curFileMaxIndex;
+    long cur_file_max_index = this->log_file_max_index_ + 1;
+    std::ostringstream index_oss;
+    index_oss << std::setw(3) << std::setfill('0') << cur_file_max_index;
 
     // 当前时间戳
-    std::string nowDate = tool::GetCurrentDateTime("%Y%m%d%H%M%S");
+    std::string now_date = tool::GetCurrentDateTime("%Y%m%d%H%M%S");
 
     // 重命名后的日志文件名。示例：log_012_20210127123050.254.txt
     std::ostringstream oss;
-    oss << this->logFileDir_
+    oss << this->log_file_dir_
         << LOG_FILE_PRE
-        << indexOss.str()
+        << index_oss.str()
         << "_"
-        << nowDate
+        << now_date
         << LOG_FILE_SUF;
 
-    std::string newLogFileName = oss.str();
+    std::string new_log_filename = oss.str();
 
-    if (-1 == rename(curLogFileName.c_str(), newLogFileName.c_str())) {
+    if (-1 == rename(cur_log_filename.c_str(), new_log_filename.c_str())) {
         if (DEBUG) {
             tool::PrintLog(LogLevel::Error, TAG, LOG_THREAD_NAME,
                            ">>> 日志文件重命名为 %s 失败！errno = %d",
-                           newLogFileName.c_str(), errno);
+                           new_log_filename.c_str(), errno);
         }
         return false;
     }
 
     if (DEBUG) {
         tool::PrintLog(LogLevel::Debug, TAG, LOG_THREAD_NAME,
-                       ">>> 日志文件重命名为 %s 成功", newLogFileName.c_str());
+                       ">>> 日志文件重命名为 %s 成功", new_log_filename.c_str());
     }
 
     return true;
@@ -261,19 +261,19 @@ bool LogStorageHelper::UpdateLogFileParams() {
      */
 
     // 日志文件名的最大索引
-    long tLogFileMaxIndex = -1;
+    long t_log_file_max_index = -1;
 
     // 日志文件名的最小索引
-    long tLogFileMinIndex = LONG_MAX;
+    long t_log_file_min_index = LONG_MAX;
 
     // 日志文件的个数
-    long tLogFileNums = 0;
+    long t_log_file_nums = 0;
 
     DIR *dir;
-    if ((dir = opendir(this->logFileDir_.c_str())) == nullptr) {
+    if ((dir = opendir(this->log_file_dir_.c_str())) == nullptr) {
         if (DEBUG) {
             tool::PrintLog(LogLevel::Error, TAG, LOG_THREAD_NAME,
-                           ">>> 打开日志所在目录 %s 失败，errno = %d", this->logFileDir_.c_str(), errno);
+                           ">>> 打开日志所在目录 %s 失败，errno = %d", this->log_file_dir_.c_str(), errno);
         }
         return false;
     }
@@ -290,40 +290,40 @@ bool LogStorageHelper::UpdateLogFileParams() {
             continue;
         }
 
-        ++tLogFileNums;
+        ++t_log_file_nums;
 
-        long tempIndex = 0;
+        long temp_index = 0;
 
         // 获取当前日志文件的索引值
         for (int i = static_cast<int>(strlen(LOG_FILE_PRE)); i < strlen(filename); ++i) {
             if (filename[i] >= '0' && filename[i] <= '9') {
-                tempIndex = tempIndex * 10 + (filename[i] - '0');
+                temp_index = temp_index * 10 + (filename[i] - '0');
             } else {
                 break;
             }
         }
 
-        if (tempIndex > tLogFileMaxIndex) {
-            tLogFileMaxIndex = tempIndex;
+        if (temp_index > t_log_file_max_index) {
+            t_log_file_max_index = temp_index;
         }
 
-        if (tempIndex < tLogFileMinIndex) {
-            tLogFileMinIndex = tempIndex;
+        if (temp_index < t_log_file_min_index) {
+            t_log_file_min_index = temp_index;
         }
 
     }
 
     closedir(dir);
 
-    if (tLogFileNums == 0) {
+    if (t_log_file_nums == 0) {
         // 说明日志目录下尚没有日志文件
-        tLogFileMaxIndex = 0;
-        tLogFileMinIndex = 0;
+        t_log_file_max_index = 0;
+        t_log_file_min_index = 0;
     }
 
-    this->logFileMaxIndex_ = tLogFileMaxIndex;
-    this->logFileMinIndex_ = tLogFileMinIndex;
-    this->logFileNums_ = tLogFileNums;
+    this->log_file_max_index_ = t_log_file_max_index;
+    this->log_file_min_index_ = t_log_file_min_index;
+    this->log_file_nums_ = t_log_file_nums;
 
     return true;
 }
@@ -332,7 +332,7 @@ int LogStorageHelper::DeleteOldestLogFile() {
 
     this->UpdateLogFileParams();
 
-    if (this->logFileNums_ < LOG_FILE_MAX_NUM) {
+    if (this->log_file_nums_ < LOG_FILE_MAX_NUM) {
         return 0;
     }
 
@@ -340,16 +340,16 @@ int LogStorageHelper::DeleteOldestLogFile() {
      * 历史日志文件如超出磁盘空间的限制，则删除最老的日志文件
      */
 
-    int deleteFileNums = 0;
+    int delete_file_nums = 0;
 
     // 待删除的历史日志文件的索引最大值：[-oo, end]
-    long end = this->logFileMinIndex_ + (this->logFileNums_ - LOG_FILE_MAX_NUM);
+    long end = this->log_file_min_index_ + (this->log_file_nums_ - LOG_FILE_MAX_NUM);
 
     DIR *dir;
-    if ((dir = opendir(this->logFileDir_.c_str())) == nullptr) {
+    if ((dir = opendir(this->log_file_dir_.c_str())) == nullptr) {
         if (DEBUG) {
             tool::PrintLog(LogLevel::Error, TAG, LOG_THREAD_NAME,
-                           ">>> 打开日志所在目录 %s 失败，errno = %d", this->logFileDir_.c_str(), errno);
+                           ">>> 打开日志所在目录 %s 失败，errno = %d", this->log_file_dir_.c_str(), errno);
         }
         return false;
     }
@@ -380,24 +380,24 @@ int LogStorageHelper::DeleteOldestLogFile() {
             continue;
         }
 
-        std::string filePath = this->logFileDir_ + filename;
+        std::string filepath = this->log_file_dir_ + filename;
 
         // 删除日志文件
-        int isOk = ::remove(filePath.c_str());
-        if (isOk == EOF) {
+        int is_ok = ::remove(filepath.c_str());
+        if (is_ok == EOF) {
             if (DEBUG) {
                 tool::PrintLog(LogLevel::Error, TAG, LOG_THREAD_NAME,
-                               ">>> 删除历史日志文件 %s 失败，errno = %d", filePath.c_str(), errno);
+                               ">>> 删除历史日志文件 %s 失败，errno = %d", filepath.c_str(), errno);
             }
             continue;
         }
 
         if (DEBUG) {
             tool::PrintLog(LogLevel::Info, TAG, LOG_THREAD_NAME,
-                           ">>> 删除历史日志文件 %s 成功", filePath.c_str());
+                           ">>> 删除历史日志文件 %s 成功", filepath.c_str());
         }
 
-        ++deleteFileNums;
+        ++delete_file_nums;
     }
 
     closedir(dir);
@@ -409,23 +409,23 @@ int LogStorageHelper::DeleteOldestLogFile() {
 
     this->UpdateLogFileParams();
 
-    if (this->logFileNums_ >= LOG_FILE_MAX_NUM) {
-        deleteFileNums += this->DeleteOldestLogFile();
+    if (this->log_file_nums_ >= LOG_FILE_MAX_NUM) {
+        delete_file_nums += this->DeleteOldestLogFile();
     }
 
-    return deleteFileNums;
+    return delete_file_nums;
 }
 
 long LogStorageHelper::GetLogFileMaxIndex() const {
-    return this->logFileMaxIndex_;
+    return this->log_file_max_index_;
 }
 
 long LogStorageHelper::GetLogFileMinIndex() const {
-    return this->logFileMinIndex_;
+    return this->log_file_min_index_;
 }
 
 long LogStorageHelper::GetLogFileNums() const {
-    return this->logFileNums_;
+    return this->log_file_nums_;
 }
 
 long LogStorageHelper::GetLocationToBeWritten(FILE *file) const {
@@ -436,12 +436,12 @@ long LogStorageHelper::GetLocationToBeWritten(FILE *file) const {
 
     fseek(file, 0, SEEK_END);
 
-    long fileSize = ftell(file);
+    long file_size = ftell(file);
 
 //    auto t1 = AIDotLog::CurrentTimeMills();
 
     long start = 0;
-    long end = fileSize - 1;
+    long end = file_size - 1;
     long mid = 0;
     char ch = 0;
 

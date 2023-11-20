@@ -15,22 +15,22 @@
 
 namespace log {
 
-LogModel::LogModel(const std::string &logFileDir) : mmapImpl_(nullptr) {
+LogModel::LogModel(const std::string &log_file_dir) : mmap_impl_(nullptr) {
     // 进行 Mmap 映射
-    this->mmapImpl_ = std::make_shared<LogMmap>(logFileDir);
+    this->mmap_impl_ = std::make_shared<LogMmap>(log_file_dir);
 }
 
-bool LogModel::WriteLogToFile(const std::shared_ptr<LogData> &logData) {
+bool LogModel::WriteLogToFile(const std::shared_ptr<LogData> &log_data) {
 
-    if (LogStrategy::LOG_MMAP == this->mmapImpl_->GetLogStrategy()) {
+    if (LogStrategy::LOG_MMAP == this->mmap_impl_->GetLogStrategy()) {
 
         // 如果是 Mmap 机制
-        this->mmapImpl_->WriteLogToFileInMmap(logData);
+        this->mmap_impl_->WriteLogToFileInMmap(log_data);
 
-    } else if (LogStrategy::LOG_MEMORY == this->mmapImpl_->GetLogStrategy()) {
+    } else if (LogStrategy::LOG_MEMORY == this->mmap_impl_->GetLogStrategy()) {
 
         // 如果是内存缓存机制
-        this->mmapImpl_->WriteLogToFileInMem(logData);
+        this->mmap_impl_->WriteLogToFileInMem(log_data);
 
     } else {
         if (DEBUG) {

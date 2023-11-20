@@ -46,7 +46,7 @@ public:
      * 注意：必须在调用日志打印接口之前被调用！
      * @param logDir 日志文件的根目录
      */
-    static bool Init(const char *rootDir);
+    static bool Init(const char *root_dir);
 
     /**
      * 释放资源，退出时调用。

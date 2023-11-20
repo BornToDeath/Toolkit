@@ -41,16 +41,16 @@ public: /* Methods                                         */
 
     /**
      * 禁用拷贝构造
-     * @param logData
+     * @param log_data
      */
-    LogData(const LogData &logData) = delete;
+    LogData(const LogData &log_data) = delete;
 
     /**
      * 禁用赋值运算符
-     * @param logData
+     * @param log_data
      * @return
      */
-    LogData &operator=(const LogData &logData) = delete;
+    LogData &operator=(const LogData &log_data) = delete;
 
 public:
 

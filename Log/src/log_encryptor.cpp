@@ -15,36 +15,36 @@
 
 namespace log {
 
-void LogEncryptor::EncryptLog(const std::string &inputLog, std::string &outputLog) {
+void LogEncryptor::EncryptLog(const std::string &input_log, std::string &output_log) {
 
     if (DEBUG) {
-        outputLog = inputLog;
+        output_log = input_log;
         return;
     }
 
     const std::string key = LOG_ENCRYPT_KEY;
-    size_t keyLen = key.length();
+    size_t key_len = key.length();
 
-    char *base64Input = Base64Encode(inputLog.c_str(), inputLog.length());
-    int base64Len = static_cast<int>(strlen(base64Input));
+    char *base64_input = Base64Encode(input_log.c_str(), input_log.length());
+    int base64_len = static_cast<int>(strlen(base64_input));
 
-    for (int i = 0; i < base64Len; i++) {
+    for (int i = 0; i < base64_len; i++) {
 //        char c = base64Input[i];
-        for (int j = 0; j < keyLen; j++) {
+        for (int j = 0; j < key_len; j++) {
             // 为什么这种方法加密之后的数据不对？
 //            c ^= key[j];
-            char s = (char) (base64Input[i] ^ key[j]);
-            base64Input[i] = s;
+            char s = (char) (base64_input[i] ^ key[j]);
+            base64_input[i] = s;
         }
 //        base64Input[i] = c;
     }
 
     // 注意：base64Len 的长度必须传进去，否则编码有问题！问题是：在 Base64Encode() 内部通过 strlen() 函数获取到的 base64Input 长度和此时获取到的长度不同
-    char *result = Base64Encode(base64Input, base64Len);
+    char *result = Base64Encode(base64_input, base64_len);
 
-    outputLog = result;
+    output_log = result;
 
-    free(base64Input);
+    free(base64_input);
     free(result);
 }
 

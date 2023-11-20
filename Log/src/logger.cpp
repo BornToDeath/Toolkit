@@ -2,20 +2,22 @@
 // Created by lixiaoqing on 2021/5/19.
 //
 
+#include "logger.h"
+
 /* 系统头文件 */
-#include <iostream>
-#include <queue>
-#include <cstdio>
-#include <cstdarg>
 #include <sys/prctl.h>
-#include <sstream>
-#include <memory>
+
+#include <cstdarg>
+#include <cstdio>
 #include <functional>
+#include <iostream>
+#include <memory>
+#include <queue>
+#include <sstream>
 
 /* 自定义头文件 */
-#include "logger.h"
-#include "log_tool.h"
 #include "log_encryptor.h"
+#include "log_tool.h"
 
 /* 自定义宏 */
 #define TAG "Logger"

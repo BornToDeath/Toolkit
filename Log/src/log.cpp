@@ -2,19 +2,20 @@
 // Created by lixiaoqing on 2021/8/8.
 //
 
+#include "log.h"
+
 /**
  * 系统头文件
  */
-#include <thread>
-#include <queue>
-#include <cstring>
-#include <cstdarg>
 #include <atomic>
+#include <cstdarg>
+#include <cstring>
+#include <queue>
+#include <thread>
 
 /**
  * 自定义头文件
  */
-#include "log.h"
 #include "logger.h"
 #include "log_tool.h"
 

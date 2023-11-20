@@ -13,8 +13,8 @@
 /**
  * 自定义头文件
  */
-#include "log_common.h"
 #include "log.h"
+#include "log_common.h"
 
 namespace log {
 

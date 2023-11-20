@@ -2,19 +2,18 @@
 // Created by lixiaoqing on 2021/5/19.
 //
 
+#include "log_tool.h"
 
 /******** 系统头文件 *********/
-#include <iostream>
 #include <sys/prctl.h>
 #include <sys/stat.h>
+
 #include <chrono>
 #include <cstdarg>
 #include <cstring>
 #include <iomanip>
+#include <iostream>
 #include <sstream>
-
-/******** 自定义头文件 *********/
-#include "log_tool.h"
 
 /** 定义日志输出到标准输出时的颜色 */
 #define LOG_COLOR_RESET "\033[0m"

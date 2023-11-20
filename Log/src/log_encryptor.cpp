@@ -2,13 +2,14 @@
 // Created by lixiaoqing on 2021/5/19.
 //
 
+#include "log_encryptor.h"
+
 /** 系统头文件  */
 #include <cstring>
 
 /**
  * 自定义头文件
  */
-#include "log_encryptor.h"
 #include "log_common.h"
 #include "log_tool.h"
 

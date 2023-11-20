@@ -2,11 +2,12 @@
 // Created by lixiaoqing on 2021/5/19.
 //
 
+#include "log_model.h"
+
 /********* 系统头文件 **********/
 #include <memory>
 
 /********* 自定义头文件 **********/
-#include "log_model.h"
 #include "log_tool.h"
 
 /********* 宏定义 **********/

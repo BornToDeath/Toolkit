@@ -1,8 +1,12 @@
 #ifndef MD5_H
 #define MD5_H
 
-#include <string>
 #include <fstream>
+#include <string>
+
+namespace utils {
+namespace string_util {
+namespace md5 {
 
 /* Type define */
 typedef unsigned char byte;
@@ -48,5 +52,9 @@ private:
 	static const char HEX[16];
 	enum { BUFFER_SIZE = 1024 };
 };
+
+}  // namespace md5
+}  // namespace string_util
+}  // namespace utils
 
 #endif /*MD5_H*/

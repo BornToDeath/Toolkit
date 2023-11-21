@@ -2,22 +2,26 @@
 // Created by lixiaoqing on 2021/7/14.
 //
 
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <numeric>
-#include <cstring>
-#include <unistd.h>
-#include "Device/DeviceUtil.h"
+#include "device/device_util.h"
 
-#define TAG "DeviceUtil"
+#include <unistd.h>
+
+#include <cstring>
+#include <fstream>
+#include <iostream>
+#include <numeric>
+#include <vector>
+
+#define TAG "device_util"
 #define CPU_SLEEP_DURATION (3)
 
+namespace utils {
+namespace device_util {
 
-float DeviceUtil::getCPUTemperature() {
+float GetCPUTemperature() {
     // thermal/thermal_zoneX/type 为 "cpu" 的才是 cpu 的温度
-    const std::string filePath = "/sys/class/thermal/thermal_zone0/temp";
-    std::ifstream input(filePath, std::ios::in);
+    const std::string filepath = "/sys/class/thermal/thermal_zone0/temp";
+    std::ifstream input(filepath, std::ios::in);
     if (!input.is_open()) {
         return 0;
     }
@@ -37,12 +41,12 @@ float DeviceUtil::getCPUTemperature() {
     return temp;
 }
 
-float DeviceUtil::getGPUTemperature() {
+float GetGPUTemperature() {
     // TODO 没有找到获取 GPU 温度的 API
     return 0;
 }
 
-unsigned int DeviceUtil::getMemoryTotal() {
+unsigned int GetMemoryTotal() {
 #if 0
     // 获取总内存大小
     const char *cmd = R"(cat /proc/meminfo | grep MemTotal | awk '{print $2}')";
@@ -81,10 +85,10 @@ unsigned int DeviceUtil::getMemoryTotal() {
 #endif
 }
 
-unsigned int DeviceUtil::getMemoryUsage() {
+unsigned int GetMemoryUsage() {
     // 获取内存占用情况
-    auto total = getMemoryTotal();
-    auto free = getMemoryFree();
+    auto total = GetMemoryTotal();
+    auto free = GetMemoryFree();
     if (total == 0 || free == 0) {
         return 0;
     }
@@ -92,7 +96,7 @@ unsigned int DeviceUtil::getMemoryUsage() {
     return (usage > 0) ? usage : 0;
 }
 
-unsigned int DeviceUtil::getMemoryFree() {
+unsigned int GetMemoryFree() {
 #if 0
     // 获取可用内存大小
     const char *cmd = R"(cat /proc/meminfo | grep MemFree | sed -n '1p' | awk '{print $2}')";
@@ -132,7 +136,7 @@ unsigned int DeviceUtil::getMemoryFree() {
 }
 
 
-std::string DeviceUtil::executeCommand(const char *cmd) {
+std::string ExecuteCommand(const char *cmd) {
     std::string ret;
 
     // 执行 shell 命令
@@ -152,13 +156,13 @@ std::string DeviceUtil::executeCommand(const char *cmd) {
     return ret;
 }
 
-unsigned int DeviceUtil::getMemoryUsageByPid(int pid) {
+unsigned int GetMemoryUsageByPid(int pid) {
     uint32_t value = 0;
-    char strLinkFile[1024];
-    sprintf(strLinkFile, "/proc/%d/status", pid);
+    char filepath[1024];
+    sprintf(filepath, "/proc/%d/status", pid);
 
     char buff[1024] = {0};
-    FILE *fd = fopen(strLinkFile, "r");
+    FILE *fd = fopen(filepath, "r");
     if (fd == nullptr) {
         return 0;
     }
@@ -176,10 +180,10 @@ unsigned int DeviceUtil::getMemoryUsageByPid(int pid) {
     return value * 1024;
 }
 
-std::string DeviceUtil::getNameByPid(int pid) {
-    char filePath[64]{};
-    sprintf(filePath, "/proc/%d/comm", pid);
-    std::ifstream ifs(filePath, std::ios::in);
+std::string GetNameByPid(int pid) {
+    char filepath[64]{};
+    sprintf(filepath, "/proc/%d/comm", pid);
+    std::ifstream ifs(filepath, std::ios::in);
     if (!ifs.is_open()) {
         return "";
     }
@@ -195,40 +199,40 @@ std::string DeviceUtil::getNameByPid(int pid) {
     return line;
 }
 
-int DeviceUtil::getLogicalCpuCoreCount() {
-    int coreCount = 0;
+int GetLogicalCpuCoreCount() {
+    int core_count = 0;
 
-    const std::string filePath = "/proc/cpuinfo";
-    std::ifstream ifs(filePath, std::ios::in);
+    const std::string filepath = "/proc/cpuinfo";
+    std::ifstream ifs(filepath, std::ios::in);
     if (!ifs.is_open()) {
-        return coreCount;
+        return core_count;
     }
 
     std::string line;
     while (getline(ifs, line)) {
         if (line.find("processor") != std::string::npos) {
-            ++coreCount;
+            ++core_count;
         }
     }
     ifs.close();
 
-    return coreCount;
+    return core_count;
 }
 
-int DeviceUtil::getOnlineCpuCoreCount() {
-    int coreCount = getLogicalCpuCoreCount();
+int GetOnlineCpuCoreCount() {
+    int core_count = GetLogicalCpuCoreCount();
 
-    const std::string filePath = "/sys/devices/system/cpu/online";
-    std::ifstream ifs(filePath, std::ios::in);
+    const std::string filepath = "/sys/devices/system/cpu/online";
+    std::ifstream ifs(filepath, std::ios::in);
     if (!ifs.is_open()) {
-        return coreCount;
+        return core_count;
     }
 
     std::string line;
     getline(ifs, line);
     ifs.close();
     if (line.empty()) {
-        return coreCount;
+        return core_count;
     }
 
     line.erase(0, line.find_first_not_of(' '));
@@ -267,13 +271,13 @@ int DeviceUtil::getOnlineCpuCoreCount() {
         i = j + 1;
     }
 
-    coreCount = count;
-    return coreCount;
+    core_count = count;
+    return core_count;
 }
 
-std::string DeviceUtil::getCpuHardware() {
-    const std::string filePath = "/proc/cpuinfo";
-    std::ifstream ifs(filePath, std::ios::in);
+std::string GetCpuHardware() {
+    const std::string filepath = "/proc/cpuinfo";
+    std::ifstream ifs(filepath, std::ios::in);
     if (!ifs.is_open()) {
         return "";
     }
@@ -302,25 +306,27 @@ std::string DeviceUtil::getCpuHardware() {
     return line;
 }
 
-float DeviceUtil::getTotalCpuUsage() {
-    auto beginCpuTime = internal::getTotalCpuTime();
+float GetTotalCpuUsage() {
+    auto begin_cpu_time = internal::GetTotalCpuTime();
     sleep(CPU_SLEEP_DURATION);
-    auto endCpuTime = internal::getTotalCpuTime();
-    auto idleUsage = (endCpuTime.second - beginCpuTime.second) * 1.0f / (endCpuTime.first - beginCpuTime.first);
-    return 1 - idleUsage;
+    auto end_cpu_time = internal::GetTotalCpuTime();
+    auto idle_usage =
+            (end_cpu_time.second - begin_cpu_time.second) * 1.0f / (end_cpu_time.first - begin_cpu_time.first);
+    return 1 - idle_usage;
 }
 
-float DeviceUtil::getCurProcCpuUsage() {
-    auto beginTotalCpuTime = internal::getTotalCpuTime();
-    auto beginProcCpuTime = internal::getCurProcCpuTime();
+float GetCurProcCpuUsage() {
+    auto begin_total_cpu_time = internal::GetTotalCpuTime();
+    auto begin_proc_cpu_time = internal::GetCurProcCpuTime();
     sleep(CPU_SLEEP_DURATION);
-    auto endProcCpuTime = internal::getCurProcCpuTime();
-    auto endTotalCpuTime = internal::getTotalCpuTime();
-    auto usage = (endProcCpuTime - beginProcCpuTime) * 1.0f / (endTotalCpuTime.first - beginTotalCpuTime.first);
-    return usage * getLogicalCpuCoreCount();
+    auto end_proc_cpu_time = internal::GetCurProcCpuTime();
+    auto end_total_cpu_time = internal::GetTotalCpuTime();
+    auto usage =
+            (end_proc_cpu_time - begin_proc_cpu_time) * 1.0f / (end_total_cpu_time.first - begin_total_cpu_time.first);
+    return usage * GetLogicalCpuCoreCount();
 }
 
-std::pair<long, long> DeviceUtil::internal::getTotalCpuTime() {
+std::pair<long, long> internal::GetTotalCpuTime() {
     FILE *fd = fopen("/proc/stat", "r");
     if (fd == nullptr) {
         return {};
@@ -345,11 +351,11 @@ std::pair<long, long> DeviceUtil::internal::getTotalCpuTime() {
     return {total, idle};
 }
 
-long DeviceUtil::internal::getCurProcCpuTime() {
-    char filePath[64]{};
-    sprintf(filePath, "/proc/%d/stat", getpid());
-    std::string cpuModel;
-    std::ifstream ifs(filePath, std::ios::in);
+long internal::GetCurProcCpuTime() {
+    char filepath[64]{};
+    sprintf(filepath, "/proc/%d/stat", getpid());
+    std::string cpu_model;
+    std::ifstream ifs(filepath, std::ios::in);
     if (!ifs.is_open()) {
         return 0;
     }
@@ -372,3 +378,6 @@ long DeviceUtil::internal::getCurProcCpuTime() {
     sscanf(info.c_str(), "%d %d %d %d", &utime, &stime, &cutime, &cstime);
     return utime + stime + cutime + cstime;
 }
+
+}  // namespace device_util
+}  // namespace utils

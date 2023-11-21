@@ -2,21 +2,27 @@
 // Created by lixiaoqing on 2021/6/24.
 //
 
+#include "string/string_util.h"
+
 #include <cstring>
 #include <sstream>
-#include "String/StringUtil.h"
-#include "MD5.h"
 
+#include "md5.h"
 
-bool StringUtil::compare(const std::string &s1, const std::string &s2) {
+namespace utils {
+namespace string_util {
+
+using namespace md5;
+
+bool Compare(const std::string &s1, const std::string &s2) {
     return (s1 == s2);
 }
 
-bool StringUtil::compare(const char *s1, const char *s2) {
+bool Compare(const char *s1, const char *s2) {
     return (strcmp(s1, s2) == 0);
 }
 
-int StringUtil::string2Int(const std::string &obj) {
+int String2Int(const std::string &obj) {
     int res;
     try {
         res = std::stoi(obj);
@@ -26,7 +32,7 @@ int StringUtil::string2Int(const std::string &obj) {
     return res;
 }
 
-void StringUtil::trim(std::string &str) {
+void Trim(std::string &str) {
     if (str.empty()) {
         return;
     }
@@ -34,7 +40,7 @@ void StringUtil::trim(std::string &str) {
     str.erase(str.find_last_not_of(' ') + 1);
 }
 
-std::string StringUtil::getMD5(const std::string &str) {
+std::string GetMd5(const std::string &str) {
     if (str.empty()) {
         return "";
     }
@@ -43,7 +49,7 @@ std::string StringUtil::getMD5(const std::string &str) {
     return md5.toString();
 }
 
-std::vector<std::string> StringUtil::split(const std::string &str, const char sep) {
+std::vector<std::string> Split(const std::string &str, const char sep) {
     if (str.empty()) {
         return {};
     }
@@ -57,3 +63,6 @@ std::vector<std::string> StringUtil::split(const std::string &str, const char se
     }
     return ans;
 }
+
+}  // namespace string_util
+}  // namespace utils

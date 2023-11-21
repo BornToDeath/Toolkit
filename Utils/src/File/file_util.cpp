@@ -2,39 +2,44 @@
 // Created by lixiaoqing on 2021/6/22.
 //
 
-#include <unistd.h>
+#include "file/file_util.h"
+
+#include <dirent.h>
 #include <sys/stat.h>
+#include <unistd.h>
+
 #include <fstream>
 #include <string>
-#include <dirent.h>
-#include "File/FileUtil.h"
-#include "MD5FileUtil.h"
 
+#include "md5_file_util.h"
 
-bool FileUtil::isFileExist(const char *const filePath) {
-    return 0 == access(filePath, F_OK);
+namespace utils {
+namespace file_util {
+
+bool IsFileExist(const char *const filepath) {
+    return 0 == access(filepath, F_OK);
 }
 
-bool FileUtil::isFolderExist(const char *const folderPath) {
-    return 0 == access(folderPath, F_OK);
+bool IsFolderExist(const char *const folder_path) {
+    return 0 == access(folder_path, F_OK);
 }
 
-std::string FileUtil::getFileMD5(const char *filePath) {
+std::string GetFileMD5(const char *filepath) {
     std::string md5;
-    if (filePath == nullptr) {
+    if (filepath == nullptr) {
         return md5;
     }
 
-    auto fileMD5 = MD5FileUtil::getFileMD5(filePath, 32);
-    if (fileMD5 == nullptr) {
+    auto file_md5 = md5_file_util::GetFileMD5(filepath, 32);
+    if (file_md5 == nullptr) {
         return md5;
     }
 
-    md5 = std::string(fileMD5);
+    md5 = std::string(file_md5);
     return md5;
 }
 
-bool FileUtil::createDirIfNotExist(const char *const &dir) {
+bool CreateDirIfNotExist(const char *const &dir) {
     // 如果日志目录不存在则创建
     if (0 != ::access(dir, 0)) {
         if (0 != ::mkdir(dir, 0755)) {
@@ -44,8 +49,8 @@ bool FileUtil::createDirIfNotExist(const char *const &dir) {
     return true;
 }
 
-long FileUtil::getFileSize(const char *const &filePath) {
-    FILE *fp = fopen(filePath, "rb");
+long GetFileSize(const char *const &filepath) {
+    FILE *fp = fopen(filepath, "rb");
     if (fp == nullptr) {
         return -1;
     }
@@ -57,18 +62,18 @@ long FileUtil::getFileSize(const char *const &filePath) {
     return fileSize;
 }
 
-void FileUtil::getFileBytes(const char *filePath, BYTE **data, long &length) {
-    if (filePath == nullptr) {
+void GetFileBytes(const char *filepath, BYTE **data, long &length) {
+    if (filepath == nullptr) {
         return;
     }
 
-    FILE *fp = fopen(filePath, "rb");
+    FILE *fp = fopen(filepath, "rb");
     if (fp == nullptr) {
         return;
     }
 
     // 文件长度
-    length = getFileSize(filePath);
+    length = GetFileSize(filepath);
     *data = new BYTE[length]();
 
     // 写数据
@@ -76,8 +81,8 @@ void FileUtil::getFileBytes(const char *filePath, BYTE **data, long &length) {
     fclose(fp);
 }
 
-void FileUtil::writeBinary2File(const char *filePath, const BYTE *data, int length) {
-    auto file = fopen(filePath, "wb+");
+void WriteBinaryToFile(const char *filepath, const BYTE *data, int length) {
+    auto file = fopen(filepath, "wb+");
     if (file == nullptr) {
         return;
     }
@@ -85,12 +90,12 @@ void FileUtil::writeBinary2File(const char *filePath, const BYTE *data, int leng
     fclose(file);
 }
 
-bool FileUtil::writeText2File(const std::string &filePath, const std::string &text, bool isDelete) {
+bool WriteTextToFile(const std::string &filepath, const std::string &text, bool isDelete) {
     std::ios_base::openmode mode = std::ios::out;
     if (!isDelete) {
         mode |= std::ios::app;
     }
-    std::ofstream output(filePath, mode);
+    std::ofstream output(filepath, mode);
     if (!output.is_open()) {
         return false;
     }
@@ -99,13 +104,13 @@ bool FileUtil::writeText2File(const std::string &filePath, const std::string &te
     return true;
 }
 
-std::string FileUtil::getFirstLine(const std::string &filePath) {
+std::string GetFirstLine(const std::string &filepath) {
     std::string line;
-    if (filePath.empty() || !isFileExist(filePath.c_str())) {
+    if (filepath.empty() || !IsFileExist(filepath.c_str())) {
         return line;
     }
 
-    std::ifstream input(filePath, std::ios::in);
+    std::ifstream input(filepath, std::ios::in);
     if (!input.is_open()) {
         return line;
     }
@@ -116,8 +121,8 @@ std::string FileUtil::getFirstLine(const std::string &filePath) {
 }
 
 
-void FileUtil::deleteAllFiles(const std::string &folder) {
-    if (folder.empty() || !isFolderExist(folder.c_str())) {
+void DeleteAllFiles(const std::string &folder) {
+    if (folder.empty() || !IsFolderExist(folder.c_str())) {
         return;
     }
 
@@ -133,5 +138,7 @@ void FileUtil::deleteAllFiles(const std::string &folder) {
         ::remove(filePath.c_str());
     }
     closedir(dir);
-
 }
+
+}  // namespace file_util
+}  // namespace utils

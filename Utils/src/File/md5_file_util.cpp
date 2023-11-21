@@ -2,13 +2,17 @@
 // Created by lixiaoqing on 2021/6/22.
 //
 
+#include "md5_file_util.h"
+
 #include <cstdio>
-//#include <malloc.h>
 #include <cstdlib>
 #include <cstring>
-#include "MD5FileUtil.h"
 
 using u4 = unsigned int;
+
+namespace utils {
+namespace file_util {
+namespace md5_file_util {
 
 static unsigned char PADDING[64] = {
         0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -54,88 +58,88 @@ static unsigned char PADDING[64] = {
       }
 
 
-void MD5FileUtil::internal::MD5Init(MD5_CTX *mdContext) {
-    mdContext->i[0] = mdContext->i[1] = (u4) 0;
+void internal::MD5Init(MD5_CTX *md_context) {
+    md_context->i[0] = md_context->i[1] = (u4) 0;
 
     /* Load magic initialization constants.
     */
-    mdContext->buf[0] = (u4) 0x67452301;
-    mdContext->buf[1] = (u4) 0xefcdab89;
-    mdContext->buf[2] = (u4) 0x98badcfe;
-    mdContext->buf[3] = (u4) 0x10325476;
+    md_context->buf[0] = (u4) 0x67452301;
+    md_context->buf[1] = (u4) 0xefcdab89;
+    md_context->buf[2] = (u4) 0x98badcfe;
+    md_context->buf[3] = (u4) 0x10325476;
 }
 
-void MD5FileUtil::internal::MD5Update(MD5_CTX *mdContext, unsigned char *inBuf, unsigned int inLen) {
+void internal::MD5Update(MD5_CTX *md_context, unsigned char *in_buf, unsigned int in_len) {
     u4 in[16];
     int mdi;
     unsigned int i, ii;
 
     /* compute number of bytes mod 64 */
-    mdi = (int) ((mdContext->i[0] >> 3) & 0x3F);
+    mdi = (int) ((md_context->i[0] >> 3) & 0x3F);
 
     /* update number of bits */
-    if ((mdContext->i[0] + ((u4) inLen << 3)) < mdContext->i[0])
-        mdContext->i[1]++;
-    mdContext->i[0] += ((u4) inLen << 3);
-    mdContext->i[1] += ((u4) inLen >> 29);
+    if ((md_context->i[0] + ((u4) in_len << 3)) < md_context->i[0])
+        md_context->i[1]++;
+    md_context->i[0] += ((u4) in_len << 3);
+    md_context->i[1] += ((u4) in_len >> 29);
 
-    while (inLen--) {
+    while (in_len--) {
         /* add new character to buffer, increment mdi */
-        mdContext->in[mdi++] = *inBuf++;
+        md_context->in[mdi++] = *in_buf++;
 
         /* transform if necessary */
         if (mdi == 0x40) {
             for (i = 0, ii = 0; i < 16; i++, ii += 4)
-                in[i] = (((u4) mdContext->in[ii + 3]) << 24) |
-                        (((u4) mdContext->in[ii + 2]) << 16) |
-                        (((u4) mdContext->in[ii + 1]) << 8) |
-                        ((u4) mdContext->in[ii]);
-            transform(mdContext->buf, in);
+                in[i] = (((u4) md_context->in[ii + 3]) << 24) |
+                        (((u4) md_context->in[ii + 2]) << 16) |
+                        (((u4) md_context->in[ii + 1]) << 8) |
+                        ((u4) md_context->in[ii]);
+            Transform(md_context->buf, in);
             mdi = 0;
         }
     }
 }
 
-void MD5FileUtil::internal::MD5Final(MD5_CTX *mdContext) {
+void internal::MD5Final(MD5_CTX *md_context) {
     u4 in[16];
     int mdi;
     unsigned int i, ii;
     unsigned int padLen;
 
     /* save number of bits */
-    in[14] = mdContext->i[0];
-    in[15] = mdContext->i[1];
+    in[14] = md_context->i[0];
+    in[15] = md_context->i[1];
 
     /* compute number of bytes mod 64 */
-    mdi = (int) ((mdContext->i[0] >> 3) & 0x3F);
+    mdi = (int) ((md_context->i[0] >> 3) & 0x3F);
 
     /* pad out to 56 mod 64 */
     padLen = (mdi < 56) ? (56 - mdi) : (120 - mdi);
-    MD5Update(mdContext, PADDING, padLen);
+    MD5Update(md_context, PADDING, padLen);
 
     /* append length in bits and transform */
     for (i = 0, ii = 0; i < 14; i++, ii += 4)
-        in[i] = (((u4) mdContext->in[ii + 3]) << 24) |
-                (((u4) mdContext->in[ii + 2]) << 16) |
-                (((u4) mdContext->in[ii + 1]) << 8) |
-                ((u4) mdContext->in[ii]);
-    transform(mdContext->buf, in);
+        in[i] = (((u4) md_context->in[ii + 3]) << 24) |
+                (((u4) md_context->in[ii + 2]) << 16) |
+                (((u4) md_context->in[ii + 1]) << 8) |
+                ((u4) md_context->in[ii]);
+    Transform(md_context->buf, in);
 
     /* store buffer in digest */
     for (i = 0, ii = 0; i < 4; i++, ii += 4) {
-        mdContext->digest[ii] = (unsigned char) (mdContext->buf[i] & 0xFF);
-        mdContext->digest[ii + 1] =
-                (unsigned char) ((mdContext->buf[i] >> 8) & 0xFF);
-        mdContext->digest[ii + 2] =
-                (unsigned char) ((mdContext->buf[i] >> 16) & 0xFF);
-        mdContext->digest[ii + 3] =
-                (unsigned char) ((mdContext->buf[i] >> 24) & 0xFF);
+        md_context->digest[ii] = (unsigned char) (md_context->buf[i] & 0xFF);
+        md_context->digest[ii + 1] =
+                (unsigned char) ((md_context->buf[i] >> 8) & 0xFF);
+        md_context->digest[ii + 2] =
+                (unsigned char) ((md_context->buf[i] >> 16) & 0xFF);
+        md_context->digest[ii + 3] =
+                (unsigned char) ((md_context->buf[i] >> 24) & 0xFF);
     }
 }
 
 /* Basic MD5 step. transform buf based on in.
 */
-void MD5FileUtil::internal::transform(u4 *buf, u4 *in) {
+void internal::Transform(u4 *buf, u4 *in) {
     u4 a = buf[0], b = buf[1], c = buf[2], d = buf[3];
 
     /* Round 1 */
@@ -232,24 +236,24 @@ void MD5FileUtil::internal::transform(u4 *buf, u4 *in) {
     buf[3] += d;
 }
 
-char *MD5FileUtil::getFileMD5(const char *path, int md5_len) {
-    if(path == nullptr) {
+char *GetFileMD5(const char *filepath, int md5_len) {
+    if (filepath == nullptr) {
         return nullptr;
     }
 
-    FILE *fp = fopen(path, "rb");
+    FILE *fp = fopen(filepath, "rb");
     if (fp == nullptr) {
         return nullptr;
     }
 
-    MD5_CTX mdContext;
+    internal::MD5_CTX mdContext;
     int bytes;
     unsigned char data[1024];
     char *file_md5;
     int i;
 
     if (fp == NULL) {
-        fprintf(stderr, "fopen %s failed\n", path);
+        fprintf(stderr, "fopen %s failed\n", filepath);
         return NULL;
     }
 
@@ -284,3 +288,7 @@ char *MD5FileUtil::getFileMD5(const char *path, int md5_len) {
     fclose(fp);
     return file_md5;
 }
+
+}  // namespace md5_file_util
+}  // namespace file_util
+}  // namespace utils

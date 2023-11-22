@@ -45,8 +45,9 @@ int String2Int(const std::string &obj);
 void Trim(std::string &str);
 
 /**
- * 获取字符串的 MD5 值
+ * 获取字符串的 MD5 值 (大写字母)
  * @param str
+ * @return
  */
 std::string GetMd5(const std::string &str);
 

@@ -25,11 +25,15 @@ public:
     auto enqueue(F &&f, Args &&... args) -> std::future<typename std::result_of<F(Args...)>::type>;
 
 private:
-    std::vector<std::thread> workers;
-    std::queue<std::function<void()>> tasks;
-    std::mutex queue_mutex;
-    std::condition_variable condition;
-    std::atomic<bool> stop{false};
+    std::vector<std::thread> workers_;
+    std::queue<std::function<void()>> tasks_;
+    std::mutex queue_mutex_;
+    std::condition_variable condition_;
+    std::atomic<bool> stop_{false};
+
+private:
+    // for test
+    friend class ThreadPoolTest_ThreadPool2_Test;
 };
 
 inline ThreadPool::ThreadPool(int count) {
@@ -38,25 +42,25 @@ inline ThreadPool::ThreadPool(int count) {
             for (;;) {
                 std::function<void()> task;
                 {
-                    std::unique_lock<std::mutex> lock(queue_mutex);
-                    condition.wait(lock, [this]() { return !tasks.empty() || stop.load(); });
-                    if (stop.load() && tasks.empty()) {
+                    std::unique_lock<std::mutex> lock(queue_mutex_);
+                    condition_.wait(lock, [this]() { return !tasks_.empty() || stop_.load(); });
+                    if (stop_.load() && tasks_.empty()) {
                         return;
                     }
-                    task = std::move(tasks.front());
-                    tasks.pop();
+                    task = std::move(tasks_.front());
+                    tasks_.pop();
                 }
                 task();
             }
         };
-        workers.emplace_back(runnable);
+        workers_.emplace_back(runnable);
     }
 }
 
 inline ThreadPool::~ThreadPool() {
-    stop.store(true);
-    condition.notify_all();
-    for (auto &worker: workers) {
+    stop_.store(true);
+    condition_.notify_all();
+    for (auto &worker: workers_) {
         worker.join();
     }
 }
@@ -68,13 +72,13 @@ auto ThreadPool::enqueue(F &&f, Args &&... args) -> std::future<typename std::re
             std::bind(std::forward<F>(f), std::forward<Args>(args)...));
     std::future<return_type> res = task->get_future();
     {
-        std::unique_lock<std::mutex> lock(queue_mutex);
-        if (stop.load()) {
+        std::unique_lock<std::mutex> lock(queue_mutex_);
+        if (stop_.load()) {
             throw std::runtime_error("enqueue on stopped ThreadPool");
         }
-        tasks.emplace([task]() { (*task)(); });
+        tasks_.emplace([task]() { (*task)(); });
     }
-    condition.notify_one();
+    condition_.notify_one();
     return res;
 }
 

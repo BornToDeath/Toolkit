@@ -11,11 +11,11 @@
 class ThreadPoolTest : public testing::Test {
 public:
     void SetUp() override {
-
+        pool_ = std::make_unique<ThreadPool>(4);
     }
 
     void TearDown() override {
-
+        pool_.reset();
     }
 
 public:
@@ -31,9 +31,9 @@ TEST_F(ThreadPoolTest, ThreadPool) {
 
     std::vector<std::future<int>> results;
     {
-        ThreadPool pool(4);
         for (int i = 0; i < 10; ++i) {
-            std::future<int> f = pool.enqueue(runnable, i);
+            auto &&f = pool_->enqueue(runnable, i);
+            EXPECT_TRUE(f.valid());
             results.emplace_back(std::move(f));
         }
     }
@@ -45,10 +45,17 @@ TEST_F(ThreadPoolTest, ThreadPool) {
 
 TEST_F(ThreadPoolTest, ThreadPool2) {
     pool_ = std::make_unique<ThreadPool>(4);
-    EXPECT_FALSE(pool_->stop_);
+    EXPECT_FALSE(pool_->is_stop_);
     EXPECT_EQ(pool_->workers_.size(), 4);
-    auto future1 = pool_->enqueue([]() { return 10; });
-    printf("future1: %d", future1.get());
+    auto &&f = pool_->enqueue([]() { return 10; });
+    EXPECT_TRUE(f.valid());
+    printf("future: %d\n", f.get());
+}
+
+TEST(ThreadPoolTest2, ThreadPool) {
+    ThreadPool pool(-1);
+    auto &&future = pool.enqueue([]() { return 10; });
+    EXPECT_FALSE(future.valid());
 }
 
 //TEST(ThreadPoolTask, ThreadPool) {

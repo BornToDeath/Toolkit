@@ -4,7 +4,8 @@
 
 #include <iostream>
 #include <thread>
-#include "NotificationCenter.h"
+
+#include "notification_center.h"
 
 
 void sleep(int seconds);
@@ -14,22 +15,25 @@ int main() {
 
     std::cout << "===== 开始测试 =====" << std::endl;
 
-    auto notification = NotificationCenter::defaultCenter;
+    auto notification = NotificationCenter::default_center_;
 
-    notification->addObserver("LXQ", [](void *data) {
+    notification->AddObserver("LXQ", [](void *data) {
         std::cout << "[1]消息正在被执行" << std::endl;
-        sleep(3);
+        sleep(1);
     });
 
-    notification->addObserver("LXQ", [](void *data) {
+    auto observer = [](void *data) {
         std::cout << "[2]消息正在被执行" << std::endl;
-        sleep(5);
-    });
+        sleep(1);
+    };
+    notification->AddObserver("LXQ", observer);
 
-    notification->postNotification("LXQ", nullptr);
+    notification->PostNotification("LXQ", nullptr);
+
+    notification->RemoveObserver("LXQ", observer);
 
     std::cout << "===== 结束测试 =====" << std::endl;
-    sleep(100000);
+    sleep(1);
     return 0;
 }
 

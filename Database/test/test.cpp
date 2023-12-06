@@ -4,8 +4,9 @@
 
 #include <iostream>
 #include <memory>
-#include "SQLiteDatabase.h"
-#include "DBMaster.h"
+
+#include "db_master.h"
+#include "sqlite_database.h"
 
 
 void test01();
@@ -16,19 +17,19 @@ int main() {
 }
 
 void test01() {
-    auto dbMaster = std::make_shared<DBMaster>();
-    if (!dbMaster) {
+    auto db_master = std::make_shared<DbMaster>();
+    if (!db_master) {
         std::cout << "创建 DBMaster 失败！" << std::endl;
         return;
     }
 
-    const std::string dbPath = "/home/nvidia/Toolkit/Database/test/test.db";
-    auto isOK = dbMaster->open(dbPath);
+    const std::string db_path = "/home/Tookit/Database/test/test.db";
+    auto isOK = db_master->Open(db_path);
     if (!isOK) {
         std::cout << "打开数据库失败！" << std::endl;
         return;
     }
 
-    auto version = dbMaster->getVersion();
+    auto version = db_master->GetVersion();
     std::cout << "数据库版本: " << version << std::endl;
 }

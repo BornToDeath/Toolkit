@@ -20,13 +20,13 @@
 
 ## 2. 线程池
 
-头文件：`ThreadPool.h` ，使用静态方法创建, 调用 `shutDownAndDeleteSelf()` 销毁。
+头文件：`thread_pool.h` ，使用静态方法创建, 调用 `ShutDownAndDeleteSelf()` 销毁。
 
 
 ### 2.1 创建
 
 ```C++
-auto *pool = ThreadPool::newThreadPool("线程池的名称", 3/*最大线程数*/);
+auto *pool = ThreadPool::NewInstance("线程池的名称", 3/*最大线程数*/);
 ```
 
 ### 2.2 添加任务
@@ -42,13 +42,13 @@ pool->execute(runnable);
 ### 2.3 释放空闲线程
 
 ```C++
-pool->releaseIdleThreads();
+pool->ReleaseIdleThreads();
 ```
 
 ### 2.3 销毁
 
 ```C++
-pool->shutDownAndDeleteSelf();
+pool->ShutDownAndDeleteSelf();
 pool = nullptr;
 ```
 
@@ -62,7 +62,7 @@ pool = nullptr;
 ### 3.1 创建定时器
 
 ```c++
-#include "Timer/Timer.h"
+#include "timer/timer.h"
 
 Runnabkle runnable = []() {
     // xxx
@@ -75,10 +75,10 @@ Timer timer(runnable);
 
 ```c++
 // 延迟执行任务
-timer.startDelay(2000);
+timer.StartDelay(1000);
 
 // 在将来的某个时刻执行任务
-timer.startAt(timeMills);
+timer.StartAt(TimeMills);
 ```
 
 ### 3.3 销毁定时器

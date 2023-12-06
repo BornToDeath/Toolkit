@@ -4,16 +4,17 @@
 
 #include <iostream>
 #include <thread>
-#include "SQLiteDatabase.h"
+
+#include "sqlite_database.h"
 
 
 void sleep(int seconds);
 
 template<class Type>
 void logger(const Type text) {
-    auto curTime = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    auto cur_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     char buf[64] = {0};
-    strftime(buf, 64, "%Y-%m-%d %H:%M:%S", std::localtime(&curTime));
+    strftime(buf, 64, "%Y-%m-%d %H:%M:%S", std::localtime(&cur_time));
     std::cout << buf << " | " << std::this_thread::get_id() << " | " << text << std::endl;
 }
 
@@ -21,11 +22,11 @@ void logger(const Type text) {
 int main() {
     logger("===== 开始测试 =====");
 
-    SQLiteDatabase db;
-    logger(db.isThreadSafe());
+    SqliteDatabase db;
+    logger(db.IsThreadSafe());
 
     logger("===== 结束测试 =====");
-    sleep(100000);
+    sleep(3);
     return 0;
 }
 

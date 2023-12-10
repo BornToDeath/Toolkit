@@ -5,14 +5,16 @@
 #ifndef LOCKFREEQUEUE_H
 #define LOCKFREEQUEUE_H
 
-#include <unistd.h>
+#include <cstring>
+
 #include <fcntl.h>
 #include <sys/mman.h>
+#include <unistd.h>
 //#include <sys/stat.h>
 //#include <sys/types.h>
 
 
-/* 开启 spinlock 锁，适用多生产者多消费者场景 */
+/* 开启 Spinlock 锁，适用多生产者多消费者场景 */
 #define USE_LOCK
 
 /* 开启队列大小的2的幂对齐。目的是方便计算头尾索引 */
@@ -45,9 +47,9 @@ public:
         }
 #endif
 
-        m_size = size;
+        size_ = size;
         if (name == nullptr) {
-            m_buffer = new T[m_size]();
+            buffer_ = new T[size_]();
         } else {
             // 创建共享内存信道
             int shm_fd = shm_open(name, O_CREAT | O_RDWR, 0666);
@@ -56,13 +58,13 @@ public:
                 exit(1);
             }
             // 设置共享内存的大小
-            if (ftruncate(shm_fd, m_size * sizeof(T)) < 0) {
+            if (ftruncate(shm_fd, size_ * sizeof(T)) < 0) {
                 perror("ftruncate failed");
                 close(shm_fd);
                 exit(1);
             }
             // 共享内存映射
-            void *addr = mmap(nullptr, m_size * sizeof(T), PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
+            void *addr = mmap(nullptr, size_ * sizeof(T), PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
             if (addr == MAP_FAILED) {
                 perror("mmap failed");
                 close(shm_fd);
@@ -72,104 +74,104 @@ public:
                 perror("close failed");
                 exit(1);
             }
-            m_buffer = static_cast<T *>(addr);
-            memcpy(shm_name, name, strlen(name));
+            buffer_ = static_cast<T *>(addr);
+            memcpy(shm_name_, name, strlen(name));
         }
     }
 
     ~LockFreeQueue() {
-        if (shm_name[0] == 0) {  // 创建的是堆内存
-            delete[] m_buffer;
+        if (shm_name_[0] == 0) {  // 创建的是堆内存
+            delete[] buffer_;
         } else {  // 创建的是共享内存
-            if (munmap(m_buffer, m_size * sizeof(T)) == -1) {
+            if (munmap(buffer_, size_ * sizeof(T)) == -1) {
                 perror("munmap failed");
             }
-            if (shm_unlink(shm_name) == -1) {
+            if (shm_unlink(shm_name_) == -1) {
                 perror("shm_unlink failed");
             }
         }
-        m_buffer = nullptr;
+        buffer_ = nullptr;
     }
 
 public:
 
-    bool push(const T &value) {
+    bool Push(const T &value) {
 #ifdef USE_LOCK
-        m_lock.lock();
+        lock_.Lock();
 #endif
-        if (isFull()) {
+        if (IsFull()) {
 #ifdef USE_LOCK
-            m_lock.unlock();
+            lock_.Unlock();
 #endif
             return false;
         }
 
-        memcpy(m_buffer + m_tail, &value, sizeof(T));
+        memcpy(buffer_ + tail_, &value, sizeof(T));
 
 #ifdef USE_MEM_BAR
         MEMORY_BARRIER;
 #endif
 
 #ifdef USE_POT
-        m_tail = (m_tail + 1) & (m_size - 1);
+        tail_ = (tail_ + 1) & (size_ - 1);
 #else
-        m_tail = (m_tail + 1) % m_size;
+        tail_ = (tail_ + 1) % size_;
 #endif
 
 #ifdef USE_LOCK
-        m_lock.unlock();
+        lock_.Unlock();
 #endif
 
         return true;
     }
 
-    bool pop(T &value) {
+    bool Pop(T &value) {
 #ifdef USE_LOCK
-        m_lock.lock();
+        lock_.Lock();
 #endif
-        if (isEmpty()) {
+        if (IsEmpty()) {
 #ifdef USE_LOCK
-            m_lock.unlock();
+            lock_.Unlock();
 #endif
             return false;
         }
 
-        memcpy(&value, m_buffer + m_head, sizeof(T));
+        memcpy(&value, buffer_ + head_, sizeof(T));
 
 #ifdef USE_MEM_BAR
         MEMORY_BARRIER;
 #endif
 
 #ifdef USE_POT
-        m_head = (m_head + 1) & (m_size - 1);
+        head_ = (head_ + 1) & (size_ - 1);
 #else
-        m_head = (m_head + 1) % m_size;
+        head_ = (head_ + 1) % size_;
 #endif
 
 #ifdef USE_LOCK
-        m_lock.unlock();
+        lock_.Unlock();
 #endif
         return true;
     }
 
-    bool isFull() const {
+    bool IsFull() const {
 #ifdef USE_POT
-        return m_head == ((m_tail + 1) & (m_size - 1));
+        return head_ == ((tail_ + 1) & (size_ - 1));
 #else
-        return m_head == (m_tail + 1) % m_size;
+        return head_ == (tail_ + 1) % size_;
 #endif
     }
 
-    bool isEmpty() const {
-        return m_head == m_tail;
+    bool IsEmpty() const {
+        return head_ == tail_;
     }
 
-    unsigned int head() const {
-        return m_head;
+    unsigned int Head() const {
+        return head_;
     }
 
-    unsigned int tail() const {
-        return m_tail;
+    unsigned int Tail() const {
+        return tail_;
     }
 
 private:
@@ -190,28 +192,28 @@ private:
     }
 
 private:
-    class spinlock {
+    class Spinlock {
     public:
-        void lock() {
-            while (!__sync_bool_compare_and_swap(&m_lock, 0, 1)) {}
+        void Lock() {
+            while (!__sync_bool_compare_and_swap(&m_lock_, 0, 1)) {}
         }
 
-        void unlock() {
-            __sync_lock_release(&m_lock);
+        void Unlock() {
+            __sync_lock_release(&m_lock_);
         }
 
     private:
-        int m_lock{0};
+        int m_lock_{0};
     };
 
 private:
-    char shm_name[32]{};              // 共享内存 key 的路径名称
-    volatile unsigned int m_head{0};  // 队列头部索引
-    volatile unsigned int m_tail{0};  // 队列尾部索引（指向队列尾部元素的下一个元素）
-    unsigned int m_size{0};           // 队列大小
-    T *m_buffer{nullptr};             // 数据缓冲区
+    char shm_name_[32]{};              // 共享内存 key 的路径名称
+    volatile unsigned int head_{0};  // 队列头部索引
+    volatile unsigned int tail_{0};  // 队列尾部索引（指向队列尾部元素的下一个元素）
+    unsigned int size_{0};           // 队列大小
+    T *buffer_{nullptr};             // 数据缓冲区
 #ifdef USE_LOCK
-    spinlock m_lock;                  // CAS 实现的锁机制
+    Spinlock lock_;                  // CAS 实现的锁机制
 #endif
 };
 

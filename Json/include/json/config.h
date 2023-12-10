@@ -16,7 +16,7 @@
 /// Force usage of standard new/malloc based allocator instead of memory pool based allocator.
 /// The memory pools allocator used optimization (initializing Value and ValueInternalLink
 /// as if it was a POD) that may cause some validation tool to report errors.
-/// Only has effects if JSON_VALUE_USE_INTERNAL_MAP is defined.
+/// Only Has effects if JSON_VALUE_USE_INTERNAL_MAP is defined.
 //#  define JSON_USE_SIMPLE_INTERNAL_ALLOCATOR 1
 
 /// If defined, indicates that Json use exception to report invalid type manipulation

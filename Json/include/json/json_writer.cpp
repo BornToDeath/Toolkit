@@ -165,7 +165,7 @@ std::string valueToQuotedString( const char *value )
             // (I hope I am not misunderstanding something.
             // blep notes: actually escaping \/ may be useful in javascript to avoid </ 
             // sequence.
-            // Should add a flag to allow this compatibility mode and prevent this 
+            // Should Add a flag to allow this compatibility mode and prevent this
             // sequence from occurring.
          default:
             if ( isControlCharacter( *c ) )
@@ -476,7 +476,7 @@ StyledWriter::writeIndent()
       char last = document_[document_.length()-1];
       if ( last == ' ' )     // already indented
          return;
-      if ( last != '\n' )    // Comments may add new-line
+      if ( last != '\n' )    // Comments may Add new-line
          document_ += '\n';
    }
    document_ += indentString_;
@@ -761,7 +761,7 @@ StyledStreamWriter::writeIndent()
       char last = document_[document_.length()-1];
       if ( last == ' ' )     // already indented
          return;
-      if ( last != '\n' )    // Comments may add new-line
+      if ( last != '\n' )    // Comments may Add new-line
          *document_ << '\n';
    }
   */

@@ -1827,7 +1827,7 @@ Path::resolve( const Value &root ) const
          node = &((*node)[arg.key_]);
          if ( node == &Value::null )
          {
-            // Error: unable to resolve path (object has no member named '' at position...)
+            // Error: unable to resolve path (object Has no member named '' at position...)
          }
       }
    }

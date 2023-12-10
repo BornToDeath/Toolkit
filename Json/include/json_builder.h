@@ -1,7 +1,8 @@
-#ifndef JSON_JSONBUILDER_H
-#define JSON_JSONBUILDER_H
+#ifndef JSON_JSON_BUILDER_H
+#define JSON_JSON_BUILDER_H
 
 #include <string>
+
 #include "json/json.h"
 
 
@@ -18,41 +19,41 @@ public:
 
 public:
 
-    Json::Value &get() {
+    Json::Value &Get() {
         return this->obj;
     }
 
-    JsonBuilder &add(const std::string &key, bool value) {
+    JsonBuilder &Add(const std::string &key, bool value) {
         this->obj[key] = value;
         return *this;
     }
 
-    JsonBuilder &add(const std::string &key, int value) {
+    JsonBuilder &Add(const std::string &key, int value) {
         this->obj[key] = value;
         return *this;
     }
 
-    JsonBuilder &add(const std::string &key, unsigned long long value) {
+    JsonBuilder &Add(const std::string &key, unsigned long long value) {
         this->obj[key] = value;
         return *this;
     }
 
-    JsonBuilder &add(const std::string &key, float value) {
+    JsonBuilder &Add(const std::string &key, float value) {
         this->obj[key] = value;
         return *this;
     }
 
-    JsonBuilder &add(const std::string &key, double value) {
+    JsonBuilder &Add(const std::string &key, double value) {
         this->obj[key] = value;
         return *this;
     }
 
-    JsonBuilder &add(const std::string &key, const std::string &value) {
+    JsonBuilder &Add(const std::string &key, const std::string &value) {
         this->obj[key] = value;
         return *this;
     }
 
-    JsonBuilder &add(const std::string &key, const Json::Value &value) {
+    JsonBuilder &Add(const std::string &key, const Json::Value &value) {
         this->obj[key] = value;
         return *this;
     }
@@ -63,4 +64,4 @@ private:
 };
 
 
-#endif //JSON_JSONBUILDER_H
+#endif //JSON_JSON_BUILDER_H

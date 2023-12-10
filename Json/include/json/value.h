@@ -104,7 +104,7 @@ namespace Json {
     * The sequence of an #arrayValue will be automatically resize and initialized 
     * with #nullValue. resize() can be used to enlarge or truncate an #arrayValue.
     *
-    * The get() methods can be used to obtanis default value in the case the required element
+    * The Get() methods can be used to obtanis default value in the case the required element
     * does not exist.
     *
     * It is possible to iterate over the list of a #objectValue values using 
@@ -288,11 +288,11 @@ namespace Json {
       /// Access an array element (zero based index ).
       /// If the array contains less than index element, then null value are inserted
       /// in the array so that its size is index+1.
-      /// (You may need to say 'value[0u]' to get your compiler to distinguish
+      /// (You may need to say 'value[0u]' to Get your compiler to distinguish
       ///  this from the operator[] which takes a string.)
       Value &operator[]( UInt index );
       /// Access an array element (zero based index )
-      /// (You may need to say 'value[0u]' to get your compiler to distinguish
+      /// (You may need to say 'value[0u]' to Get your compiler to distinguish
       ///  this from the operator[] which takes a string.)
       const Value &operator[]( UInt index ) const;
       /// If the array contains at least index+1 elements, returns the element value, 
@@ -340,7 +340,7 @@ namespace Json {
                  const Value &defaultValue ) const;
 # ifdef JSON_USE_CPPTL
       /// Return the member named key if it exist, defaultValue otherwise.
-      Value get( const CppTL::ConstString &key,
+      Value Get( const CppTL::ConstString &key,
                  const Value &defaultValue ) const;
 # endif
       /// \brief Remove and return the named member.  
@@ -353,12 +353,12 @@ namespace Json {
       /// Same as removeMember(const char*)
       Value removeMember( const std::string &key );
 
-      /// Return true if the object has a member named key.
+      /// Return true if the object Has a member named key.
       bool isMember( const char *key ) const;
-      /// Return true if the object has a member named key.
+      /// Return true if the object Has a member named key.
       bool isMember( const std::string &key ) const;
 # ifdef JSON_USE_CPPTL
-      /// Return true if the object has a member named key.
+      /// Return true if the object Has a member named key.
       bool isMember( const CppTL::ConstString &key ) const;
 # endif
 
@@ -641,7 +641,7 @@ namespace Json {
     * 
     * Each bucket is made up of a chained list of ValueInternalLink. The last
     * link of a given bucket can be found in the 'previous_' field of the following bucket.
-    * The last link of the last bucket is stored in tailLink_ as it has no following bucket.
+    * The last link of the last bucket is stored in tailLink_ as it Has no following bucket.
     * Only the last link of a bucket may contains 'available' item. The last link always
     * contains at least one element unless is it the bucket one very first link.
     */

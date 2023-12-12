@@ -2,8 +2,8 @@
 // Created by lixiaoqing on 2022/10/25.
 //
 
-#ifndef RINGBUFFER_H
-#define RINGBUFFER_H
+#ifndef RING_BUFFER_H
+#define RING_BUFFER_H
 
 /**
  * 无锁环形缓冲区

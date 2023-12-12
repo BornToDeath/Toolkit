@@ -2,8 +2,8 @@
 // Created by lixiaoqing on 2022/4/27.
 //
 
-#ifndef THREADPOOL_THREADPOOL_H
-#define THREADPOOL_THREADPOOL_H
+#ifndef THREADPOOL_THREAD_POOL_H
+#define THREADPOOL_THREAD_POOL_H
 
 #include <vector>
 #include <queue>
@@ -92,4 +92,4 @@ auto ThreadPool::enqueue(F &&f, Args &&... args) -> std::future<typename std::re
     return res;
 }
 
-#endif //THREADPOOL_THREADPOOL_H
+#endif //THREADPOOL_THREAD_POOL_H

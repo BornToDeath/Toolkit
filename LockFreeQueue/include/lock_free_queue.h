@@ -2,8 +2,8 @@
 // Created by lixiaoqing on 2022/10/25.
 //
 
-#ifndef LOCKFREEQUEUE_H
-#define LOCKFREEQUEUE_H
+#ifndef LOCK_FREE_QUEUE_H
+#define LOCK_FREE_QUEUE_H
 
 #include <cstring>
 
@@ -217,4 +217,4 @@ private:
 #endif
 };
 
-#endif //LOCKFREEQUEUE_H
+#endif //LOCK_FREE_QUEUE_H

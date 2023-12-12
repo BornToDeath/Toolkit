@@ -1,7 +1,3 @@
-//
-// Created by 郑伟 on 2021/5/14.
-//
-
 #include "data_wrapper.h"
 
 #include <cstring>

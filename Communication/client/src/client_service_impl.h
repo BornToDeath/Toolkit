@@ -2,8 +2,8 @@
 // Created by lixiaoqing on 2021/5/27.
 //
 
-#ifndef AIDOT_CLIENTSERVICE_H
-#define AIDOT_CLIENTSERVICE_H
+#ifndef COMMUNICATION_CLIENT_SERVICE_IMPL_H
+#define COMMUNICATION_CLIENT_SERVICE_IMPL_H
 
 
 #include <memory>
@@ -113,4 +113,4 @@ private:
 };
 
 
-#endif //AIDOT_CLIENTSERVICE_H
+#endif //COMMUNICATION_CLIENT_SERVICE_IMPL_H

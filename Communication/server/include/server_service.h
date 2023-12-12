@@ -2,8 +2,8 @@
 // Created by lixiaoqing on 2022/8/1.
 //
 
-#ifndef TOOLKIT_ISERVERSERVICE_H
-#define TOOLKIT_ISERVERSERVICE_H
+#ifndef COMMUNICATION_SERVER_SERVICE_H
+#define COMMUNICATION_SERVER_SERVICE_H
 
 /**
  * 服务端
@@ -22,4 +22,4 @@ public:
     virtual bool Stop() = 0;
 };
 
-#endif //TOOLKIT_ISERVERSERVICE_H
+#endif //COMMUNICATION_SERVER_SERVICE_H

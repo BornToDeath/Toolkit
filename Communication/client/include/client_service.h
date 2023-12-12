@@ -2,8 +2,8 @@
 // Created by lixiaoqing on 2021/5/27.
 //
 
-#ifndef AIDOT_ICLIENTSERVICE_H
-#define AIDOT_ICLIENTSERVICE_H
+#ifndef COMMUNICATION_CLIENT_SERVICE_H
+#define COMMUNICATION_CLIENT_SERVICE_H
 
 
 #include <functional>
@@ -87,4 +87,4 @@ public:
 };
 
 
-#endif //AIDOT_ICLIENTSERVICE_H
+#endif //COMMUNICATION_CLIENT_SERVICE_H

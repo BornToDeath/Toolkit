@@ -2,8 +2,8 @@
 // Created by lixiaoqing on 2022/8/1.
 //
 
-#ifndef TOOLKIT_SERVERLISTENER_H
-#define TOOLKIT_SERVERLISTENER_H
+#ifndef COMMUNICATION_SERVER_LISTENER_H
+#define COMMUNICATION_SERVER_LISTENER_H
 
 #include <hpsocket/HPSocket.h>
 
@@ -39,4 +39,4 @@ public:
 };
 
 
-#endif //TOOLKIT_SERVERLISTENER_H
+#endif //COMMUNICATION_SERVER_LISTENER_H

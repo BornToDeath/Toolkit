@@ -2,8 +2,8 @@
 // Created by lixiaoqing on 2022/8/1.
 //
 
-#ifndef TOOLKIT_SERVERSERVICE_H
-#define TOOLKIT_SERVERSERVICE_H
+#ifndef COMMUNICATION_SERVER_SERVICE_IMPL_H
+#define COMMUNICATION_SERVER_SERVICE_IMPL_H
 
 #include <memory>
 #include <atomic>
@@ -32,4 +32,4 @@ private:
 };
 
 
-#endif //TOOLKIT_SERVERSERVICE_H
+#endif //COMMUNICATION_SERVER_SERVICE_IMPL_H

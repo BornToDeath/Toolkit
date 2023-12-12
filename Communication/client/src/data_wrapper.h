@@ -1,9 +1,5 @@
-//
-// Created by 郑伟 on 2021/5/14.
-//
-
-#ifndef ANDROID_DATAWRAPPER_H
-#define ANDROID_DATAWRAPPER_H
+#ifndef COMMUNICATION_DATA_WRAPPER_H
+#define COMMUNICATION_DATA_WRAPPER_H
 
 
 #include <cstdint>
@@ -68,4 +64,4 @@ private:
 };
 
 
-#endif //ANDROID_DATAWRAPPER_H
+#endif //COMMUNICATION_DATA_WRAPPER_H

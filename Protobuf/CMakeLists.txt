@@ -20,14 +20,14 @@ option(ENABLE_PROTOC_WAY "set ON to enable protoc bin to generate .pb.h/cc" OFF)
 option(ENABLE_CMAKE_WAY "set ON to enable cmake protobuf_generate_cpp() to generate .pb.h/cc" OFF)
 
 # 3. 使用 protobuf 库和头文件
-option(ENABLE_PROTOBUF_LIB_WAY "set ON to use existing protobuf library" ON)
+option(ENABLE_PROTOBUF_LIB_WAY "set ON to use existing protobuf library" OFF)
 
 # 单元测试开关
 option(UNIT_TEST "set ON to enable unit test" OFF)
 
 ###############################################
 
-set(LIB_NAME "Protobuf_static")
+set(LIB_NAME "protobuf_static")
 aux_source_directory(src PB_SRCS)
 
 if (ENABLE_PROTOC_WAY)
@@ -44,7 +44,7 @@ if (ENABLE_PROTOC_WAY)
     add_library(${LIB_NAME} STATIC ${PB_SRCS} ${PROTO_SRCS})
     target_include_directories(
             ${LIB_NAME} PUBLIC
-            inc/
+            include/
             proto/
             ${PROTOBUF_INCLUDE_DIRS}
     )
@@ -56,7 +56,7 @@ if (ENABLE_CMAKE_WAY)
     find_package(Protobuf 3 REQUIRED)
 
     # 生成 Protobuf 源文件和头文件
-    file(GLOB_RECURSE PROTOS ${CMAKE_CURRENT_LIST_DIR}/*.proto)
+    file(GLOB_RECURSE PROTOS ${CMAKE_CURRENT_LIST_DIR}/proto/*.proto)
     foreach (proto ${PROTOS})
         protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${proto})
     endforeach ()
@@ -64,11 +64,11 @@ if (ENABLE_CMAKE_WAY)
     add_library(${LIB_NAME} STATIC ${PB_SRCS} ${PROTO_SRCS})
     target_include_directories(
             ${LIB_NAME} PUBLIC
-            inc/
+            include/
             ${Protobuf_INCLUDE_DIRS}
             ${CMAKE_CURRENT_BINARY_DIR}
     )
-    target_link_libraries(${LIB_NAME} ${Protobuf_LIBRARIES})
+    target_link_libraries(${LIB_NAME} ${Protobuf_LIBRARIES} pthread)
 endif ()
 
 if (ENABLE_PROTOBUF_LIB_WAY)
@@ -76,9 +76,9 @@ if (ENABLE_PROTOBUF_LIB_WAY)
     add_library(${LIB_NAME} STATIC ${PB_SRCS} ${PROTO_SRCS})
     target_include_directories(
             ${LIB_NAME} PUBLIC
-            inc/
+            include/
             proto/
-            protobuf/linux/inc/
+            protobuf/linux/include/
     )
 #    find_library(PROTOBUF_LIB libprotobuf.a protobuf/linux/lib/)
     find_library(PROTOBUF_LIB libprotobuf.so protobuf/linux/lib/)

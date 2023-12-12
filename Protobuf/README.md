@@ -37,25 +37,25 @@ CMake 使用 Protobuf 有三种方式：
 2. 使用 `PbHelper` 类来进行 PB 相关的一些操作。
 
 ```c++
-#include "PbHelper"
+#include "pb_helper.h"
 
 tutorial::Person person;
 std::string s;
 
 // pb 转 string
-PbHelper::toString(person, s);
+PbHelper::ToString(person, s);
 
 // pb 转 json
-PbHelper::toJson(person, s);
+PbHelper::ToJson(person, s);
 
 // pb 转 二进制数据
-PbHelper::toBinary(person, s);
+PbHelper::ToBinary(person, s);
 
 // 二进制数据 转 pb
-PbHelper::parseFromBinary(s, person);
+PbHelper::ParseFromBinary(s, person);
 
 // json 转 pb
-PbHelper::parseFromJson(s, person);
+PbHelper::ParseFromJson(s, person);
 ```
 
 

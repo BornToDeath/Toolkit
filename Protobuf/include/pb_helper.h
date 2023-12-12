@@ -2,10 +2,11 @@
 // Created by lixiaoqing on 2023/7/17.
 //
 
-#ifndef PROTOBUF_PBHELPER_H
-#define PROTOBUF_PBHELPER_H
+#ifndef PROTOBUF_PB_HELPER_H
+#define PROTOBUF_PB_HELPER_H
 
 #include <string>
+
 #include "google/protobuf/message.h"
 
 class PbHelper final {
@@ -24,7 +25,7 @@ public:
      * @param output  序列化之后的结果。string 只是作为序列化之后的数据的容器，并非意味着可见字符串
      * @return
      */
-    static bool toBinary(const google::protobuf::Message &message, std::string &output);
+    static bool ToBinary(const google::protobuf::Message &message, std::string &output);
 
     /**
      * pb 转 string (可见字符串)
@@ -32,7 +33,7 @@ public:
      * @param output
      * @return
      */
-    static bool toString(const google::protobuf::Message &message, std::string &output);
+    static bool ToString(const google::protobuf::Message &message, std::string &output);
 
     /**
      * pb 转 json
@@ -40,7 +41,7 @@ public:
      * @param output
      * @return
      */
-    static bool toJson(const google::protobuf::Message &message, std::string &output);
+    static bool ToJson(const google::protobuf::Message &message, std::string &output);
 
     /**
      * 二进制 转 pb
@@ -50,7 +51,7 @@ public:
      * @param message
      * @return
      */
-    static bool parseFromBinary(const std::string &input, google::protobuf::Message &message);
+    static bool ParseFromBinary(const std::string &input, google::protobuf::Message &message);
 
     /**
      * json 转 pb
@@ -58,7 +59,7 @@ public:
      * @param message
      * @return
      */
-    static bool parseFromJson(const std::string &input, google::protobuf::Message &message);
+    static bool ParseFromJson(const std::string &input, google::protobuf::Message &message);
 };
 
-#endif //PROTOBUF_PBHELPER_H
+#endif //PROTOBUF_PB_HELPER_H

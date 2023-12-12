@@ -3,8 +3,9 @@
 //
 
 #include <iostream>
-#include "PbHelper.h"
-#include "Person.pb.h"
+
+#include "pb_helper.h"
+#include "person.pb.h"
 
 namespace PbTest {
     void testToBinary() {
@@ -24,7 +25,7 @@ namespace PbTest {
         phone2->set_type(tutorial::Person::HOME);
 
         std::string s;
-        PbHelper::toBinary(person, s);
+        PbHelper::ToBinary(person, s);
         std::cout << s << std::endl;
 
         google::protobuf::ShutdownProtobufLibrary();
@@ -47,7 +48,7 @@ namespace PbTest {
         phone2->set_type(tutorial::Person::HOME);
 
         std::string s;
-        PbHelper::toString(person, s);
+        PbHelper::ToString(person, s);
         std::cout << s << std::endl;
     }
 
@@ -68,7 +69,7 @@ namespace PbTest {
         phone2->set_type(tutorial::Person::HOME);
 
         std::string json;
-        PbHelper::toJson(person, json);
+        PbHelper::ToJson(person, json);
         std::cout << json << std::endl;
     }
 
@@ -89,10 +90,10 @@ namespace PbTest {
         phone2->set_type(tutorial::Person::HOME);
 
         std::string s;
-        PbHelper::toBinary(person, s);
+        PbHelper::ToBinary(person, s);
 
         tutorial::Person p2;
-        PbHelper::parseFromBinary(s, p2);
+        PbHelper::ParseFromBinary(s, p2);
 
         std::cout << p2.name() << std::endl;
         std::cout << p2.email() << std::endl;
@@ -108,7 +109,7 @@ namespace PbTest {
         std::string json = R"({"name":"zhangsan","id":1,"email":"123456@email.com","phones":[{"number":"123456789","type":2},{"number":"987654321","type":1}]})";
         tutorial::Person person;
         std::cout << std::boolalpha
-                  << PbHelper::parseFromJson(json, person) << std::endl;
+                  << PbHelper::ParseFromJson(json, person) << std::endl;
         std::cout << "id: " << person.id() << std::endl;
         std::cout << "name: " << person.name() << std::endl;
         std::cout << "email: " << person.email() << std::endl;

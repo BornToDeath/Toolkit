@@ -2,10 +2,10 @@
 // Created by lixiaoqing on 2021/8/29.
 //
 
-#ifndef THREADDISPATCHER_COUNTDOWNLATCH_H
-#define THREADDISPATCHER_COUNTDOWNLATCH_H
+#ifndef THREAD_DISPATCHER_COUNTDOWN_LATCH_H
+#define THREAD_DISPATCHER_COUNTDOWN_LATCH_H
 
-#include "Lock/WaitHelper.h"
+#include "lock/wait_helper.h"
 
 
 /**
@@ -31,26 +31,26 @@ public:
     /**
      * 创建智能指针实例。
      */
-    static std::shared_ptr<CountDownLatch> create(int count);
+    static std::shared_ptr<CountDownLatch> Create(int count);
 
     /**
      * 让等待数量减一，意味着有一个任务已经完成了。
      */
-    void countDown();
+    void CountDown();
 
     /**
      * 等待直到任务完成。
      */
-    void await();
+    void Await();
 
 private:
 
-    int count;
+    int count_;
 
-    std::recursive_mutex mutex;
+    std::recursive_mutex mutex_;
 
-    WaitHelper helper;
+    WaitHelper helper_;
 };
 
 
-#endif //THREADDISPATCHER_COUNTDOWNLATCH_H
+#endif //THREAD_DISPATCHER_COUNTDOWN_LATCH_H

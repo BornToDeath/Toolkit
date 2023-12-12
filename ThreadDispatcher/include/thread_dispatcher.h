@@ -2,14 +2,14 @@
 // Created by lixiaoqing on 2021/8/19.
 //
 
-#ifndef THREAD_THREADDISPATCHER_H
-#define THREAD_THREADDISPATCHER_H
+#ifndef THREAD_DISPATCHER_THREAD_DISPATCHER_H
+#define THREAD_DISPATCHER_THREAD_DISPATCHER_H
 
-#include "Thread/Runnable.h"
-#include "Thread/HandlerThread.h"
-#include "Thread/ThreadLocal.h"
-#include "Thread/ThreadUtil.h"
-#include "ThreadPool/ThreadPool.h"
+#include "thread/handler_thread.h"
+#include "thread/runnable.h"
+#include "thread/thread_local.h"
+#include "thread/thread_pool.h"
+#include "thread/thread_util.h"
 
 
 /**
@@ -19,7 +19,7 @@ class ThreadDispatcher {
 
 public:
 
-    ThreadDispatcher(const std::string &name, size_t maxConcurrentThreadNum);
+    ThreadDispatcher(const std::string &name, size_t max_concurrent_thread_count);
 
     ~ThreadDispatcher();
 
@@ -29,80 +29,80 @@ public:
      * 获取默认的 ThreadDispatcher
      * @return
      */
-    static ThreadDispatcher *getDefaultThreadDispatcher();
+    static ThreadDispatcher *GetDefaultThreadDispatcher();
 
     /**
      * 在 Bus 线程执行
      * @param runnable
      */
-    void runOnBus(Runnable runnable);
+    void RunOnBus(Runnable runnable);
 
     /**
      * 在 Bus 线程延迟执行
      * @param runnable
      * @param delay
      */
-    void postOnBus(Runnable runnable, Timestamp delay);
+    void PostOnBus(Runnable runnable, Timestamp delay);
 
     /**
      * 在 串行异步线程池 中执行
      * @param runnable
      * @param name
      */
-    void runOnSerial(Runnable runnable, std::string name = "NoName");
+    void RunOnSerial(Runnable runnable, std::string name = "NoName");
 
     /**
      * 在 并发异步线程池 中执行
      * @param runnable
      * @param name
      */
-    void runOnConcurrent(Runnable runnable, std::string name = "NoName");
+    void RunOnConcurrent(Runnable runnable, std::string name = "NoName");
 
     /**
      * 获取当前线程的 Flag
      * @return
      */
-    int getCurrentThreadFlag();
+    int GetCurrentThreadFlag();
 
 public:
 
     /** 线程标记：BUS 线程 */
-    static const int THREAD_FLAG_BUS = 1;
+    static const int kThreadFlagBus = 1;
 
     /** 线程标记：Serial 线程 */
-    static const int THREAD_FLAG_SERIAL = 2;
+    static const int kThreadFlagSerial = 2;
 
     /** 线程标记：Concurrent 线程 */
-    static const int THREAD_FLAG_CONCURRENT = 3;
+    static const int kThreadFlagConcurrent = 3;
 
 private:
 
     /**
      * 默认的 ThreadDispatcher 对象
      */
-    static ThreadDispatcher *defaultDispatcher;
+    static ThreadDispatcher *default_dispatcher_;
 
     /**
      * 总线线程（其实就是个 HandlerThread ）
      */
-    HandlerThread *busThread;
+    HandlerThread *bus_thread_;
 
     /**
      * 串行异步线程池（线程池中只有一个线程）
      */
-    ThreadPool *serialPool;
+    ThreadPool *serial_pool_;
 
     /**
      * 并发异步线程池（线程池中有多个线程）
      */
-    ThreadPool *concurrentPool;
+    ThreadPool *concurrent_pool_;
 
     /**
      * 线程的标记
      */
-    ThreadLocal<int> threadFlags;
+    ThreadLocal<int> thread_flags_;
 
 };
 
 
-#endif //THREAD_THREADDISPATCHER_H
+#endif //THREAD_DISPATCHER_THREAD_DISPATCHER_H

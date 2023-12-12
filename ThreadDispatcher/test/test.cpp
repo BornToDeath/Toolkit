@@ -4,8 +4,9 @@
 
 
 #include <iostream>
-#include "ThreadDispatcher.h"
-#include "Threads.h"
+
+#include "threads.h"
+#include "thread_dispatcher.h"
 
 
 void sleep(int secs) {
@@ -18,7 +19,7 @@ void testThreads();
 
 
 int main() {
-//    testThreadDispatcher();
+    testThreadDispatcher();
     testThreads();
     return 0;
 }
@@ -26,36 +27,36 @@ int main() {
 void testThreads() {
     auto runnable = [] {
         printf("%s\n", "Runnable1 正在被执行...");
-        sleep(3);
+        sleep(1);
     };
     const std::string name = "LXQ";
-    Threads::runOnThread(name, runnable);
-    Threads::postOnThread(name, runnable, 1000);
-    sleep(10);
-    Threads::releaseThread(name);
-    sleep(1000000);
+    Threads::RunOnThread(name, runnable);
+    Threads::PostOnThread(name, runnable, 100);
+    sleep(1);
+    Threads::ReleaseThread(name);
+    sleep(1);
 }
 
 void testThreadDispatcher() {
-    auto dispatcher = ThreadDispatcher::getDefaultThreadDispatcher();
+    auto dispatcher = ThreadDispatcher::GetDefaultThreadDispatcher();
 
     auto runnable = [] {
         std::cout << "Runnable1 正在被执行..." << std::endl;
-        sleep(3);
+        sleep(1);
     };
 
-    dispatcher->runOnBus(runnable);
+    dispatcher->RunOnBus(runnable);
     std::cout << "-------------------1" << std::endl;
 
-    dispatcher->postOnBus(runnable, 5);
+    dispatcher->PostOnBus(runnable, 1);
     std::cout << "-------------------2" << std::endl;
 
-    dispatcher->runOnSerial(runnable);
+    dispatcher->RunOnSerial(runnable);
     std::cout << "-------------------3" << std::endl;
 
-    dispatcher->runOnConcurrent(runnable);
+    dispatcher->RunOnConcurrent(runnable);
     std::cout << "-------------------4" << std::endl;
 
-    sleep(10);
+    sleep(1);
     delete dispatcher;
 }

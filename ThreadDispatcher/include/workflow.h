@@ -2,13 +2,14 @@
 // Created by lixiaoqing on 2021/8/29.
 //
 
-#ifndef THREADDISPATCHER_WORKFLOW_H
-#define THREADDISPATCHER_WORKFLOW_H
+#ifndef THREAD_DISPATCHER_WORKFLOW_H
+#define THREAD_DISPATCHER_WORKFLOW_H
 
 #include <list>
-#include <memory>
 #include <map>
-#include "Thread/Runnable.h"
+#include <memory>
+
+#include "thread/runnable.h"
 
 
 enum class WorkflowActionType : int {
@@ -16,8 +17,8 @@ enum class WorkflowActionType : int {
     ACTION_TYPE_FORK = 1
 };
 
-// 将 <runnable> 执行在 <threadName> 所在线程的委托
-using ExeRunnableDelegate = std::function<void(const std::string &threadName, Runnable runnable)>;
+// 将 <runnable> 执行在 <thread_name> 所在线程的委托
+using ExeRunnableDelegate = std::function<void(const std::string &thread_name, Runnable runnable)>;
 
 using Notifier = std::function<void()>;
 
@@ -53,11 +54,11 @@ public:
     /*
      * 如何使用 Workflow：
      *
-     * Workflow::create()
-     * -> action ("线程名1", [] {
+     * Workflow::Create()
+     * -> Action ("线程名1", [] {
      *     // do something ...
      * })
-     * -> action ("线程名2", [] {
+     * -> Action ("线程名2", [] {
      *     // do something ...
      * })
      * -> start();
@@ -68,33 +69,33 @@ public:
      * 创建一个新的工作流
      * @return
      */
-    static Workflow *create();
+    static Workflow *Create();
 
     /**
      *
      * @param delegate 执行 Runnable 的委托
      * @return
      */
-    static Workflow *create(ExeRunnableDelegate delegate);
+    static Workflow *Create(ExeRunnableDelegate delegate);
 
     /**
-     * 在指定线程 thread 执行 action
+     * 在指定线程 thread 执行 Action
      * @param thread
      * @param action
      * @param tag
      * @return
      */
-    Workflow *action(const std::string &thread, WorkflowTask action, const std::string &tag = "Default");
+    Workflow *Action(const std::string &thread, WorkflowTask action, const std::string &tag = "Default");
 
     /**
      * 启动工作流
      */
-    void start();
+    void Start();
 
     /**
-     * 当前 action 执行完毕，通知可以执行下一个 action 了
+     * 当前 Action 执行完毕，通知可以执行下一个 Action 了
      */
-    void notify();
+    void Notify();
 
     /* ======================================================= */
     /* 高级用法                                                 */
@@ -104,94 +105,94 @@ public:
      * 中断。
      * 不再执行当前 Workflow 的后续步骤( finally 还会执行)。
      */
-    void interrupt();
+    void Interrupt();
 
     /**
-     * 在 指定线程 执行 action。
+     * 在 指定线程 执行 Action。
      */
-    Workflow *action(const std::string &thread, const std::function<void(Workflow *)> &action,
+    Workflow *Action(const std::string &thread, const std::function<void(Workflow *)> &action,
                      const std::string &tag = "Default");
 
     /**
      * 执行一个异步的任务。
      * 调用方可以在异步操作完成之后，调用 notifier 通知可以执行下一个步骤了。
      */
-    Workflow *async(const std::string &thread, const AsyncWorkflowTask &action, const std::string &tag = "Default");
+    Workflow *Async(const std::string &thread, const AsyncWorkflowTask &action, const std::string &tag = "Default");
 
     /**
      * 执行一个异步的任务。
      * 调用方可以在异步操作完成之后，调用 notifier 通知可以执行下一个步骤了。
      */
-    Workflow *async(const std::string &thread, std::function<void(Workflow *, Notifier)> action,
+    Workflow *Async(const std::string &thread, std::function<void(Workflow *, Notifier)> action,
                     const std::string &tag = "Default");
 
     /**
      * 所有 Block 都执行完后，会执行这个 Block。
      * 通常用于清理数据等。
      */
-    Workflow *finally(const std::string &thread, WorkflowTask action, const std::string &tag = "Default");
+    Workflow *Finally(const std::string &thread, WorkflowTask action, const std::string &tag = "Default");
 
     /**
      * 所有 Block 都执行完后，会执行这个 Block。
      * 通常用于清理数据等。
      */
-    Workflow *finally(const std::string &thread, const std::function<void(Workflow *)> &action,
+    Workflow *Finally(const std::string &thread, const std::function<void(Workflow *)> &action,
                       const std::string &tag = "Default");
 
     /**
      * 并行计算当前步骤。
      * 通常用于不需要关心结果的场景。
      */
-    Workflow *fork(const std::string &thread, WorkflowTask action, const std::string &tag = "Default");
+    Workflow *Fork(const std::string &thread, WorkflowTask action, const std::string &tag = "Default");
 
     /**
      * 并行计算当前步骤。
      * 通常用于不需要关心结果的场景。
      */
     Workflow *
-    fork(const std::string &thread, const std::function<void(Workflow *)> &action, const std::string &tag = "Default");
+    Fork(const std::string &thread, const std::function<void(Workflow *)> &action, const std::string &tag = "Default");
 
     /**
      * 添加数据到缓存
      */
-    void set(const std::string &key, std::shared_ptr<void> obj);
+    void Set(const std::string &key, std::shared_ptr<void> obj);
 
     /**
      * 从缓存读取数据
      */
     template<typename T>
-    std::shared_ptr<T> get(const std::string &key) {
-        return static_cast<T>(dataCache[key]);
+    std::shared_ptr<T> Get(const std::string &key) {
+        return static_cast<T>(data_cache_[key]);
     }
 
 
 private:
 
-    void onFinally();
+    void OnFinally();
 
 private:
 
     /**
      * 执行 runnable 的委托
      */
-    ExeRunnableDelegate exeRunnableDelegate;
+    ExeRunnableDelegate exe_runnable_delegate_;
 
     /**
      * 待执行的任务列表: <线程名, 要执行的事件, 事件类型>
      */
-    std::list<WorkflowTaskInfo> actions;
+    std::list<WorkflowTaskInfo> actions_;
 
     /**
      * 最终的任务
      */
-    std::tuple<std::string, WorkflowTask> *finallyBlock;
+    std::tuple<std::string, WorkflowTask> *finally_block_{nullptr};
 
     /**
      * 自带的缓存。
      * 里面保存的数据不会自动删除。
      */
-    std::map<std::string, std::shared_ptr<void>> dataCache;
+    std::map<std::string, std::shared_ptr<void>> data_cache_;
 };
 
 
-#endif //THREADDISPATCHER_WORKFLOW_H
+#endif //THREAD_DISPATCHER_WORKFLOW_H
